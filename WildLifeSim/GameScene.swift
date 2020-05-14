@@ -39,8 +39,8 @@ class GameScene: SKScene {
         fatalError("init(coder:) has not been implemented")
     }
     
-    let sizeHorizontal = 30
-    let sizeVertical = 20
+    let sizeHorizontal = 25
+    let sizeVertical = 15
     let sizeTile = 100
     
     let view2D:SKSpriteNode
@@ -57,6 +57,7 @@ class GameScene: SKScene {
     override func didMove(to view: SKView)
     {
         SceneSetting()
+        
         
         
         earth.sizeHorizontal = sizeHorizontal
@@ -77,6 +78,16 @@ class GameScene: SKScene {
         tileSprite.position = withPosition
         tileSprite.anchorPoint = CGPoint(x: 0, y: 0)
         view2D.addChild(tileSprite)
+        /*guard let tileSet = SKTileSet(named: "testset") else {
+            // hint: don't use the filename for named, use the tileset inside
+            fatalError()
+        }
+        let tileSize = tileSet.defaultTileSize // from image size
+        let tileMap = SKTileMapNode(tileSet: tileSet, columns: 1, rows: 1, tileSize: tileSize)
+        let tileGroup = tileSet.tileGroups.first
+        tileMap.fill(with: tileGroup) // fill or set by column/row
+        //tileMap.setTileGroup(tileGroup, forColumn: 5, row: 5)
+        self.addChild(tileMap)*/
     }
     
     func placeAllTiles2D() {

@@ -15,6 +15,7 @@
 		244C2F13246D95090085E1BB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 244C2F12246D95090085E1BB /* Assets.xcassets */; };
 		244C2F16246D95090085E1BB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 244C2F14246D95090085E1BB /* LaunchScreen.storyboard */; };
 		244C2F1E246DC5AA0085E1BB /* ClassGround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244C2F1D246DC5AA0085E1BB /* ClassGround.swift */; };
+		244C2F20246DD3CE0085E1BB /* TileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 244C2F1F246DD3CE0085E1BB /* TileSet.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		244C2F15246D95090085E1BB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		244C2F17246D95090085E1BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		244C2F1D246DC5AA0085E1BB /* ClassGround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassGround.swift; sourceTree = "<group>"; };
+		244C2F1F246DD3CE0085E1BB /* TileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = TileSet.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				244C2F05246D95060085E1BB /* AppDelegate.swift */,
 				244C2F09246D95060085E1BB /* Actions.sks */,
 				244C2F0B246D95060085E1BB /* GameScene.swift */,
+				244C2F1F246DD3CE0085E1BB /* TileSet.sks */,
 				244C2F1D246DC5AA0085E1BB /* ClassGround.swift */,
 				244C2F0D246D95060085E1BB /* GameViewController.swift */,
 				244C2F0F246D95060085E1BB /* Main.storyboard */,
@@ -135,6 +138,7 @@
 				244C2F13246D95090085E1BB /* Assets.xcassets in Resources */,
 				244C2F16246D95090085E1BB /* LaunchScreen.storyboard in Resources */,
 				244C2F0A246D95060085E1BB /* Actions.sks in Resources */,
+				244C2F20246DD3CE0085E1BB /* TileSet.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

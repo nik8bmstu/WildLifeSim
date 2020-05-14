@@ -29,7 +29,7 @@ class Ground {
         self.tiles = Array(repeating: Array(repeating: tileDefault, count: sizeVertical), count: sizeHorizontal)
         for h in 0..<sizeHorizontal {
         for v in 0..<sizeVertical {
-            let rand = Int.random(in: 0 ..< 10)
+            let rand = Int.random(in: 0 ..< 50)
             switch rand {
             case 0:
                 self.tiles[h][v] = Tile(type: "forest", foodCount: 4)
