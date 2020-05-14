@@ -45,8 +45,8 @@ class GameScene: SKScene {
     let map = SKNode()
     
     // Ground class code
-    let countColumns = 10
-    let countRows = 5
+    let countColumns = 30
+    let countRows = 25
     let sizeTile = 88
     let earth = Ground()
 
@@ -69,27 +69,27 @@ class GameScene: SKScene {
         earth.initTiles()
         
         // tileSprite code
-        let deviceScale = self.size.width / 6000//667
+        /*let deviceScale = self.size.width / 6000//667
         view2D.position = CGPoint(x: 0, y: 0)
         view2D.xScale = deviceScale
         view2D.yScale = deviceScale
         addChild(view2D)
-        placeAllTiles2D()
+        placeAllTiles2D()*/
         
         // tileMap code
         addChild(map)
         map.xScale = 0.4
         map.yScale = 0.4
         
-        let tileSet = SKTileSet(named: "textures")!
-        let tileSize = CGSize(width: 128, height: 128)
-        let sandTiles = tileSet.tileGroups.first  {$0.name == "Sand"}
+        let tileSet = SKTileSet(named: "groundsSet")!
+        let tileSize = CGSize(width: sizeTile, height: sizeTile)
+        let sandTiles = tileSet.tileGroups.first  {$0.name == "ground"}
         let botLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
         botLayer.fill(with: sandTiles)
         map.addChild(botLayer)
         
-        let grassTiles = tileSet.tileGroups.first  {$0.name == "Grass"}
-        let waterTiles = tileSet.tileGroups.first  {$0.name == "Water"}
+        let grassTiles = tileSet.tileGroups.first  {$0.name == "grass"}
+        let waterTiles = tileSet.tileGroups.first  {$0.name == "water"}
         let topLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
         
         for column in 0..<countColumns {
@@ -110,6 +110,7 @@ class GameScene: SKScene {
         //topLayer.enableAutomapping = true
         map.addChild(topLayer)
     }
+    /*
     // tileSprite code
     func placeTile2D(image: String, withPosition: CGPoint) {
         let tileSprite = SKSpriteNode(imageNamed: image)
@@ -136,7 +137,7 @@ class GameScene: SKScene {
                 placeTile2D(image: tileName, withPosition: point)
             }
         }
-    }
+    }*/
     /// Settings
     func SceneSetting()
     {
