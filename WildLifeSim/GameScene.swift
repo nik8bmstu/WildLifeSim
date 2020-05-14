@@ -35,18 +35,18 @@ enum Tiled: Int {
 }
 
 class GameScene: SKScene {
+    // tileSprite code
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+    let view2D:SKSpriteNode
+    // Ground class code
     let sizeHorizontal = 25
     let sizeVertical = 15
-    let sizeTile = 100
-    
-    let view2D:SKSpriteNode
-    
+    let sizeTile = 88
     let earth = Ground()
 
+    // tileSprite code
     override init(size: CGSize) {
         view2D = SKSpriteNode()
         super.init(size: size)
@@ -57,22 +57,21 @@ class GameScene: SKScene {
     override func didMove(to view: SKView)
     {
         SceneSetting()
-        
-        
-        
+        // Ground class code
         earth.sizeHorizontal = sizeHorizontal
         earth.sizeVertical = sizeVertical
         earth.sizeTile = sizeTile
         earth.initTiles()
         
-        let deviceScale = self.size.width / 4000//667
+        // tileSprite code
+        let deviceScale = self.size.width / 6000//667
         view2D.position = CGPoint(x: 0, y: 0)
         view2D.xScale = deviceScale
         view2D.yScale = deviceScale
         addChild(view2D)
         placeAllTiles2D()
     }
-
+    // tileSprite code
     func placeTile2D(image: String, withPosition: CGPoint) {
         let tileSprite = SKSpriteNode(imageNamed: image)
         tileSprite.position = withPosition
@@ -89,7 +88,7 @@ class GameScene: SKScene {
         //tileMap.setTileGroup(tileGroup, forColumn: 5, row: 5)
         self.addChild(tileMap)*/
     }
-    
+    // tileSprite code
     func placeAllTiles2D() {
         for h in 0..<sizeHorizontal {
             for v in 0..<sizeVertical {
@@ -99,10 +98,10 @@ class GameScene: SKScene {
             }
         }
     }
-    
+    /// Settings
     func SceneSetting()
     {
-        self.backgroundColor = SKColor.orange
+        self.backgroundColor = SKColor.white
         
     }
 }
