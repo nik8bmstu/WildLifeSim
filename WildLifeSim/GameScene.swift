@@ -68,6 +68,9 @@ class GameScene: SKScene {
         earth.sizeTile = sizeTile
         earth.initTiles()
         
+        drawMap()
+        
+        
         // tileSprite code
         /*let deviceScale = self.size.width / 6000//667
         view2D.position = CGPoint(x: 0, y: 0)
@@ -77,39 +80,46 @@ class GameScene: SKScene {
         placeAllTiles2D()*/
         
         // tileMap code
+        
+    }
+    
+    func drawMap() {
         addChild(map)
         map.xScale = 0.4
         map.yScale = 0.4
         
         let tileSet = SKTileSet(named: "groundsSet")!
         let tileSize = CGSize(width: sizeTile, height: sizeTile)
-        let sandTiles = tileSet.tileGroups.first  {$0.name == "ground"}
+        let grassTiles = tileSet.tileGroups.first  {$0.name == "grass"}
         let botLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
-        botLayer.fill(with: sandTiles)
+        botLayer.fill(with: grassTiles)
         map.addChild(botLayer)
         
-        let grassTiles = tileSet.tileGroups.first  {$0.name == "grass"}
+        let forestTiles = tileSet.tileGroups.first  {$0.name == "forest"}
         let waterTiles = tileSet.tileGroups.first  {$0.name == "water"}
+        let mountainTiles = tileSet.tileGroups.first  {$0.name == "mountain"}
         let topLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
         
         for column in 0..<countColumns {
             for row in 0..<countRows {
                 let tileName = earth.tiles[column][row].type
-                print("at \(column), \(row) - \(tileName)")
+                //print("at \(column), \(row) - \(tileName)")
                 switch tileName {
                 case "water":
                     topLayer.setTileGroup(waterTiles, forColumn: column, row: row)
                 case "forest":
-                    topLayer.setTileGroup(grassTiles, forColumn: column, row: row)
+                    topLayer.setTileGroup(forestTiles, forColumn: column, row: row)
+                case "mountain":
+                    topLayer.setTileGroup(mountainTiles, forColumn: column, row: row)
                 default:
                     _ = 0
-                    //topLayer.setTileGroup(tileSet.tileGroups[0], forColumn: column, row: row)
                 }
             }
         }
         //topLayer.enableAutomapping = true
         map.addChild(topLayer)
     }
+    
     /*
     // tileSprite code
     func placeTile2D(image: String, withPosition: CGPoint) {
