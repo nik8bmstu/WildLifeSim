@@ -45,8 +45,8 @@ class GameScene: SKScene {
     let map = SKNode()
     
     // Ground class code
-    let sizeHorizontal = 25
-    let sizeVertical = 15
+    let countColumns = 10
+    let countRows = 5
     let sizeTile = 88
     let earth = Ground()
 
@@ -63,8 +63,8 @@ class GameScene: SKScene {
     {
         SceneSetting()
         // Ground class code
-        earth.sizeHorizontal = sizeHorizontal
-        earth.sizeVertical = sizeVertical
+        earth.sizeHorizontal = countColumns
+        earth.sizeVertical = countRows
         earth.sizeTile = sizeTile
         earth.initTiles()
         
@@ -78,21 +78,43 @@ class GameScene: SKScene {
         
         // tileMap code
         addChild(map)
-        map.xScale = 0.5
-        map.yScale = 0.5
+        map.xScale = 0.4
+        map.yScale = 0.4
         
         let tileSet = SKTileSet(named: "textures")!
-        let tileSize = CGSize(width: sizeTile, height: sizeTile)
+        let tileSize = CGSize(width: 128, height: 128)
         let sandTiles = tileSet.tileGroups.first  {$0.name == "Sand"}
-        let bottomLayer = SKTileMapNode(tileSet: tileSet, columns: sizeHorizontal, rows: sizeVertical, tileSize: tileSize)
-        bottomLayer.fill(with: sandTiles)
-        map.addChild(bottomLayer)
+        let botLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
+        botLayer.fill(with: sandTiles)
+        map.addChild(botLayer)
+        
+        let grassTiles = tileSet.tileGroups.first  {$0.name == "Grass"}
+        let waterTiles = tileSet.tileGroups.first  {$0.name == "Water"}
+        let topLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
+        
+        for column in 0..<countColumns {
+            for row in 0..<countRows {
+                let tileName = earth.tiles[column][row].type
+                print("at \(column), \(row) - \(tileName)")
+                switch tileName {
+                case "water":
+                    topLayer.setTileGroup(waterTiles, forColumn: column, row: row)
+                case "forest":
+                    topLayer.setTileGroup(grassTiles, forColumn: column, row: row)
+                default:
+                    _ = 0
+                    //topLayer.setTileGroup(tileSet.tileGroups[0], forColumn: column, row: row)
+                }
+            }
+        }
+        //topLayer.enableAutomapping = true
+        map.addChild(topLayer)
     }
     // tileSprite code
     func placeTile2D(image: String, withPosition: CGPoint) {
         let tileSprite = SKSpriteNode(imageNamed: image)
         tileSprite.position = withPosition
-        tileSprite.anchorPoint = CGPoint(x: 0, y: 0)
+        tileSprite.anchorPoint = CGPoint(x: 10.0, y: 10.0)
         view2D.addChild(tileSprite)
         /*guard let tileSet = SKTileSet(named: "testset") else {
             // hint: don't use the filename for named, use the tileset inside
@@ -107,9 +129,9 @@ class GameScene: SKScene {
     }
     // tileSprite code
     func placeAllTiles2D() {
-        for h in 0..<sizeHorizontal {
-            for v in 0..<sizeVertical {
-                var point = CGPoint(x: (h * sizeTile), y: -(v * sizeTile))
+        for h in 0..<countColumns {
+            for v in 0..<countRows {
+                var point = CGPoint(x: (h * sizeTile), y: (v * sizeTile))
                 let tileName = earth.tiles[h][v].type
                 placeTile2D(image: tileName, withPosition: point)
             }
