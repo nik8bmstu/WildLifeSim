@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "wall.image.png",
+      "filename" : "ground.image.png",
       "idiom" : "universal",
       "scale" : "1x"
     },

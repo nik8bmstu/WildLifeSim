@@ -39,22 +39,14 @@ class GameScene: SKScene {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //let sizeHorizontal = 25
-    //let sizeVertical = 15
-    //let sizeTile = 40
+    let sizeHorizontal = 30
+    let sizeVertical = 20
+    let sizeTile = 100
     
     let view2D:SKSpriteNode
-
-    let tilesd = [
-                [1, 1, 1, 1, 1, 1],
-                [1 ,0, 0, 0, 0, 1],
-                [1 ,0, 0, 0, 0, 1],
-                [1 ,0, 0, 0, 0, 1],
-                [1 ,0, 0, 0, 0, 1],
-                [1, 1, 1, 1, 1, 1]
-                ]
-    let tiledSize = (width: 100, height: 100)
     
+    let earth = Ground()
+
     override init(size: CGSize) {
         view2D = SKSpriteNode()
         super.init(size: size)
@@ -66,13 +58,13 @@ class GameScene: SKScene {
     {
         SceneSetting()
         
-        /*let earth = Ground()
+        
         earth.sizeHorizontal = sizeHorizontal
         earth.sizeVertical = sizeVertical
         earth.sizeTile = sizeTile
         earth.initTiles()
-*/
-        let deviceScale = self.size.width / 2000//667
+        
+        let deviceScale = self.size.width / 4000//667
         view2D.position = CGPoint(x: 0, y: 0)
         view2D.xScale = deviceScale
         view2D.yScale = deviceScale
@@ -88,15 +80,13 @@ class GameScene: SKScene {
     }
     
     func placeAllTiles2D() {
-            for i in 0..<tilesd.count {
-                let row = tilesd[i];
-                for j in 0..<row.count {
-                    let tileInt = row[j]
-                    let tiled = Tiled(rawValue: tileInt)!
-                    var point = CGPoint(x: (j * tiledSize.width), y: -(i * tiledSize.height))
-                    placeTile2D(image: tiled.image, withPosition: point)
-                }
+        for h in 0..<sizeHorizontal {
+            for v in 0..<sizeVertical {
+                var point = CGPoint(x: (h * sizeTile), y: -(v * sizeTile))
+                let tileName = earth.tiles[h][v].type
+                placeTile2D(image: tileName, withPosition: point)
             }
+        }
     }
     
     func SceneSetting()
