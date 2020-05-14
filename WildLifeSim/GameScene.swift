@@ -40,6 +40,10 @@ class GameScene: SKScene {
         fatalError("init(coder:) has not been implemented")
     }
     let view2D:SKSpriteNode
+    
+    // tileMap code
+    let map = SKNode()
+    
     // Ground class code
     let sizeHorizontal = 25
     let sizeVertical = 15
@@ -50,7 +54,8 @@ class GameScene: SKScene {
     override init(size: CGSize) {
         view2D = SKSpriteNode()
         super.init(size: size)
-        self.anchorPoint = CGPoint(x:0.028, y:0.9)
+        //self.anchorPoint = CGPoint(x:0.028, y:0.9)
+        self.anchorPoint = CGPoint(x:0.5, y:0.5)
     }
     
     /// Main func
@@ -70,6 +75,18 @@ class GameScene: SKScene {
         view2D.yScale = deviceScale
         addChild(view2D)
         placeAllTiles2D()
+        
+        // tileMap code
+        addChild(map)
+        map.xScale = 0.5
+        map.yScale = 0.5
+        
+        let tileSet = SKTileSet(named: "textures")!
+        let tileSize = CGSize(width: sizeTile, height: sizeTile)
+        let sandTiles = tileSet.tileGroups.first  {$0.name == "Sand"}
+        let bottomLayer = SKTileMapNode(tileSet: tileSet, columns: sizeHorizontal, rows: sizeVertical, tileSize: tileSize)
+        bottomLayer.fill(with: sandTiles)
+        map.addChild(bottomLayer)
     }
     // tileSprite code
     func placeTile2D(image: String, withPosition: CGPoint) {
