@@ -11,6 +11,7 @@ import GameplayKit
 
 class GameScene: SKScene {
     
+    
     // tileSprite code
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -20,8 +21,6 @@ class GameScene: SKScene {
     // tileMap code
     let map = SKNode()
     
-    //var update = 0
-
     // tileSprite code
     override init(size: CGSize) {
         view2D = SKSpriteNode()
@@ -45,7 +44,10 @@ class GameScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        
+        env.calcFood(map: earth)
+        map.removeAllChildren()
+        drawMap(earth: earth)
+        drawFood(earth: earth)
     }
     
     func drawEnvParameters() {
@@ -60,10 +62,7 @@ class GameScene: SKScene {
     
     /// Draw earth map
     func drawMap(earth: Ground) {
-        // Create map
-        addChild(map)
-        map.xScale = 0.4
-        map.yScale = 0.4
+        
         // Connect Ground Tile set
         let tileSet = SKTileSet(named: "groundsSet")!
         let tileSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
@@ -160,6 +159,9 @@ class GameScene: SKScene {
     func SceneSetting()
     {
         self.backgroundColor = SKColor.white
-        
+        // Create map
+        addChild(map)
+        map.xScale = 0.4
+        map.yScale = 0.4
     }
 }

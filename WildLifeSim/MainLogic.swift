@@ -68,6 +68,7 @@ class Environment {
                         }
                     }
                     foodCount += newTileFood
+                    map.tiles[column][row].foodCount = newTileFood
                 }
             }
         }
