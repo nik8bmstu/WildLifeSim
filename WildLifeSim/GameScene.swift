@@ -47,7 +47,7 @@ class GameScene: SKScene {
     // Ground class code
     let countColumns = 30
     let countRows = 25
-    let sizeTile = 88
+    let sizeTile = 90
     let earth = Ground()
 
     // tileSprite code
@@ -84,39 +84,66 @@ class GameScene: SKScene {
     }
     
     func drawMap() {
+        // Create map
         addChild(map)
         map.xScale = 0.4
         map.yScale = 0.4
-        
+        // Connect Ground Tile set
         let tileSet = SKTileSet(named: "groundsSet")!
         let tileSize = CGSize(width: sizeTile, height: sizeTile)
+        let backgroundTiles = tileSet.tileGroups.first  {$0.name == "background"}
         let grassTiles = tileSet.tileGroups.first  {$0.name == "grass"}
-        let botLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
-        botLayer.fill(with: grassTiles)
-        map.addChild(botLayer)
-        
         let forestTiles = tileSet.tileGroups.first  {$0.name == "forest"}
         let waterTiles = tileSet.tileGroups.first  {$0.name == "water"}
         let mountainTiles = tileSet.tileGroups.first  {$0.name == "mountain"}
-        let topLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
-        
+        // Create bottom layer
+        let botLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
+        botLayer.fill(with: backgroundTiles)
+        map.addChild(botLayer)
+        // Create middle layer
+        let midLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
+        // Fill map from earth
         for column in 0..<countColumns {
             for row in 0..<countRows {
                 let tileName = earth.tiles[column][row].type
                 //print("at \(column), \(row) - \(tileName)")
                 switch tileName {
                 case "water":
-                    topLayer.setTileGroup(waterTiles, forColumn: column, row: row)
+                    midLayer.setTileGroup(waterTiles, forColumn: column, row: row)
                 case "forest":
-                    topLayer.setTileGroup(forestTiles, forColumn: column, row: row)
+                    midLayer.setTileGroup(forestTiles, forColumn: column, row: row)
                 case "mountain":
-                    topLayer.setTileGroup(mountainTiles, forColumn: column, row: row)
+                    midLayer.setTileGroup(mountainTiles, forColumn: column, row: row)
+                default:
+                    midLayer.setTileGroup(grassTiles, forColumn: column, row: row)
+                }
+            }
+        }
+        map.addChild(midLayer)
+        // Connect Food Tile set
+        let foodTileSet = SKTileSet(named: "food")!
+        let food1 = foodTileSet.tileGroups.first  {$0.name == "1"}
+        let food2 = foodTileSet.tileGroups.first  {$0.name == "2"}
+        let food3 = foodTileSet.tileGroups.first  {$0.name == "3"}
+        // Create top layer
+        let topLayer = SKTileMapNode(tileSet: foodTileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
+        // Fill map from earth
+        for column in 0..<countColumns {
+            for row in 0..<countRows {
+                let foodCount = earth.tiles[column][row].foodCount
+                //print("at \(column), \(row) - \(tileName)")
+                switch foodCount {
+                case 1:
+                    topLayer.setTileGroup(food1, forColumn: column, row: row)
+                case 2:
+                    topLayer.setTileGroup(food2, forColumn: column, row: row)
+                case 3:
+                    topLayer.setTileGroup(food3, forColumn: column, row: row)
                 default:
                     _ = 0
                 }
             }
         }
-        //topLayer.enableAutomapping = true
         map.addChild(topLayer)
     }
     
