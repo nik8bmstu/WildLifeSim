@@ -17,6 +17,7 @@
 		244C2F1E246DC5AA0085E1BB /* ClassGround.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244C2F1D246DC5AA0085E1BB /* ClassGround.swift */; };
 		244D07ED246E058500003CC7 /* GroundTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 244D07EC246E058500003CC7 /* GroundTileSet.sks */; };
 		244D07EF246E10EC00003CC7 /* FoodTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 244D07EE246E10EC00003CC7 /* FoodTileSet.sks */; };
+		246351EF246EE615009B3C34 /* MainLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246351EE246EE615009B3C34 /* MainLogic.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		244C2F1D246DC5AA0085E1BB /* ClassGround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassGround.swift; sourceTree = "<group>"; };
 		244D07EC246E058500003CC7 /* GroundTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GroundTileSet.sks; sourceTree = "<group>"; };
 		244D07EE246E10EC00003CC7 /* FoodTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = FoodTileSet.sks; sourceTree = "<group>"; };
+		246351EE246EE615009B3C34 /* MainLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainLogic.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				244C2F05246D95060085E1BB /* AppDelegate.swift */,
 				244C2F09246D95060085E1BB /* Actions.sks */,
 				244C2F0B246D95060085E1BB /* GameScene.swift */,
+				246351EE246EE615009B3C34 /* MainLogic.swift */,
 				244D07EC246E058500003CC7 /* GroundTileSet.sks */,
 				244D07EE246E10EC00003CC7 /* FoodTileSet.sks */,
 				244C2F1D246DC5AA0085E1BB /* ClassGround.swift */,
@@ -154,6 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				244C2F0C246D95060085E1BB /* GameScene.swift in Sources */,
+				246351EF246EE615009B3C34 /* MainLogic.swift in Sources */,
 				244C2F1E246DC5AA0085E1BB /* ClassGround.swift in Sources */,
 				244C2F0E246D95060085E1BB /* GameViewController.swift in Sources */,
 				244C2F06246D95060085E1BB /* AppDelegate.swift in Sources */,

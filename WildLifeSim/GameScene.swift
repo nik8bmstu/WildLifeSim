@@ -44,11 +44,7 @@ class GameScene: SKScene {
     // tileMap code
     let map = SKNode()
     
-    // Ground class code
-    let countColumns = 30
-    let countRows = 25
-    let sizeTile = 90
-    let earth = Ground()
+    
 
     // tileSprite code
     override init(size: CGSize) {
@@ -62,15 +58,7 @@ class GameScene: SKScene {
     override func didMove(to view: SKView)
     {
         SceneSetting()
-        // Ground class code
-        earth.sizeHorizontal = countColumns
-        earth.sizeVertical = countRows
-        earth.sizeTile = sizeTile
-        earth.initTiles()
-        
-        drawMap()
-        
-        
+    
         // tileSprite code
         /*let deviceScale = self.size.width / 6000//667
         view2D.position = CGPoint(x: 0, y: 0)
@@ -78,33 +66,41 @@ class GameScene: SKScene {
         view2D.yScale = deviceScale
         addChild(view2D)
         placeAllTiles2D()*/
-        
-        // tileMap code
-        
     }
     
-    func drawMap() {
+    func drawEnvParameters() {
+       /* var Second = SKLabelNode(text: "Романов-Кошкин-Захарьин-Голштейн-Готторпский")
+        Second.fontName = "Chalkboard SE Bold"  // задаем имя шрифта.
+        Second.fontColor = SKColor.black // задаем цвет шрифта.
+        Second.position = CGPointMake(280, 50) // задаем позицию.
+        Second.fontSize = 20 // задаем размер шрифта.
+        Second.name = "Second" // задаем имя спрайта
+        self.addChild(Second) // добавляем наш спрайт на нашу сцену.*/
+    }
+    
+    /// Draw earth map
+    func drawMap(earth: Ground) {
         // Create map
         addChild(map)
         map.xScale = 0.4
         map.yScale = 0.4
         // Connect Ground Tile set
         let tileSet = SKTileSet(named: "groundsSet")!
-        let tileSize = CGSize(width: sizeTile, height: sizeTile)
+        let tileSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
         let backgroundTiles = tileSet.tileGroups.first  {$0.name == "background"}
         let grassTiles = tileSet.tileGroups.first  {$0.name == "grass"}
         let forestTiles = tileSet.tileGroups.first  {$0.name == "forest"}
         let waterTiles = tileSet.tileGroups.first  {$0.name == "water"}
         let mountainTiles = tileSet.tileGroups.first  {$0.name == "mountain"}
         // Create bottom layer
-        let botLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
+        let botLayer = SKTileMapNode(tileSet: tileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         botLayer.fill(with: backgroundTiles)
         map.addChild(botLayer)
         // Create middle layer
-        let midLayer = SKTileMapNode(tileSet: tileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
+        let midLayer = SKTileMapNode(tileSet: tileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         // Fill map from earth
-        for column in 0..<countColumns {
-            for row in 0..<countRows {
+        for column in 0..<earth.sizeHorizontal {
+            for row in 0..<earth.sizeVertical {
                 let tileName = earth.tiles[column][row].type
                 //print("at \(column), \(row) - \(tileName)")
                 switch tileName {
@@ -126,10 +122,10 @@ class GameScene: SKScene {
         let food2 = foodTileSet.tileGroups.first  {$0.name == "2"}
         let food3 = foodTileSet.tileGroups.first  {$0.name == "3"}
         // Create top layer
-        let topLayer = SKTileMapNode(tileSet: foodTileSet, columns: countColumns, rows: countRows, tileSize: tileSize)
+        let topLayer = SKTileMapNode(tileSet: foodTileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         // Fill map from earth
-        for column in 0..<countColumns {
-            for row in 0..<countRows {
+        for column in 0..<earth.sizeHorizontal {
+            for row in 0..<earth.sizeVertical {
                 let foodCount = earth.tiles[column][row].foodCount
                 //print("at \(column), \(row) - \(tileName)")
                 switch foodCount {
