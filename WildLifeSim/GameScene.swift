@@ -9,32 +9,8 @@
 import SpriteKit
 import GameplayKit
 
-enum Tiled: Int {
-
-    case Ground
-    case Wall
-
-    var description:String {
-        switch self {
-        case .Ground:
-            return "Ground"
-        case .Wall:
-            return "Wall"
-        }
-    }
-
-    var image:String {
-        switch self {
-        case .Ground:
-            return "ground"
-        case .Wall:
-            return "wall"
-
-        }
-    }
-}
-
 class GameScene: SKScene {
+    
     // tileSprite code
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -44,7 +20,7 @@ class GameScene: SKScene {
     // tileMap code
     let map = SKNode()
     
-    
+    //var update = 0
 
     // tileSprite code
     override init(size: CGSize) {
@@ -58,7 +34,7 @@ class GameScene: SKScene {
     override func didMove(to view: SKView)
     {
         SceneSetting()
-    
+        drawEnvParameters()
         // tileSprite code
         /*let deviceScale = self.size.width / 6000//667
         view2D.position = CGPoint(x: 0, y: 0)
@@ -68,14 +44,18 @@ class GameScene: SKScene {
         placeAllTiles2D()*/
     }
     
+    override func update(_ currentTime: TimeInterval) {
+        
+    }
+    
     func drawEnvParameters() {
-       /* var Second = SKLabelNode(text: "Романов-Кошкин-Захарьин-Голштейн-Готторпский")
+       var Second = SKLabelNode(text: "234345436")
         Second.fontName = "Chalkboard SE Bold"  // задаем имя шрифта.
         Second.fontColor = SKColor.black // задаем цвет шрифта.
-        Second.position = CGPointMake(280, 50) // задаем позицию.
+        //Second.position = CGPointMake(280, 50) // задаем позицию.
         Second.fontSize = 20 // задаем размер шрифта.
         Second.name = "Second" // задаем имя спрайта
-        self.addChild(Second) // добавляем наш спрайт на нашу сцену.*/
+        self.addChild(Second) // добавляем наш спрайт на нашу сцену.
     }
     
     /// Draw earth map
@@ -116,7 +96,12 @@ class GameScene: SKScene {
             }
         }
         map.addChild(midLayer)
+        
+    }
+    /// Draw food on map
+    func drawFood (earth: Ground){
         // Connect Food Tile set
+        let tileSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
         let foodTileSet = SKTileSet(named: "food")!
         let food1 = foodTileSet.tileGroups.first  {$0.name == "1"}
         let food2 = foodTileSet.tileGroups.first  {$0.name == "2"}

@@ -29,45 +29,49 @@ class Environment {
         for column in 0..<map.sizeHorizontal {
             for row in 0..<map.sizeVertical {
                 let currentTileFood = map.tiles[column][row].foodCount
-                var newTileFood = 0
-                let chance = Int.random(in: 0...100)
-                switch currentTileFood {
-                case 1:
-                    switch chance {
-                    case 0...10:
-                        newTileFood = 2
-                    case 11...70:
-                        newTileFood = 1
+                let currentTileType = map.tiles[column][row].type
+                if currentTileType == "forest" {
+                    var newTileFood = 0
+                    let chance = Int.random(in: 0...100)
+                    switch currentTileFood {
+                    case 1:
+                        switch chance {
+                        case 0...10:
+                            newTileFood = 2
+                        case 11...70:
+                            newTileFood = 1
+                        default:
+                            newTileFood = 0
+                        }
+                    case 2:
+                        switch chance {
+                        case 0...10:
+                            newTileFood = 3
+                        case 11...60:
+                            newTileFood = 2
+                        default:
+                            newTileFood = 1
+                        }
+                    case 3:
+                        switch chance {
+                        case 0...60:
+                            newTileFood = 2
+                        default:
+                            newTileFood = 3
+                        }
                     default:
-                        newTileFood = 0
+                        switch chance {
+                        case 0...60:
+                            newTileFood = 1
+                        default:
+                            newTileFood = 0
+                        }
                     }
-                case 2:
-                    switch chance {
-                    case 0...10:
-                        newTileFood = 3
-                    case 11...60:
-                        newTileFood = 2
-                    default:
-                        newTileFood = 1
-                    }
-                case 3:
-                    switch chance {
-                    case 0...60:
-                        newTileFood = 2
-                    default:
-                        newTileFood = 3
-                    }
-                default:
-                    switch chance {
-                    case 0...60:
-                        newTileFood = 1
-                    default:
-                        newTileFood = 0
-                    }
+                    foodCount += newTileFood
                 }
-                foodCount += newTileFood
             }
         }
+        print("FOOD = \(foodCount)")
     }
 }
 

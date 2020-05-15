@@ -10,38 +10,62 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-class GameViewController: UIViewController {
+// Ground class code
+let countColumns = 30
+let countRows = 15
+let sizeTile = 90
+let earth = Ground()
+let env = Environment()
 
-    // Ground class code
-    let countColumns = 30
-    let countRows = 15
-    let sizeTile = 90
-    let earth = Ground()
-    let env = Environment()
+/*extension GameViewController: SKSceneDelegate {
+    func update(_ currentTime: TimeInterval, for scene: SKScene) {
+        if makeNodeModifications {
+            makeNodeModifications = false
+            
+            env.calcFood(map: earth)
+        }
+    }
+}*/
+
+class GameViewController: UIViewController {
+    
+    /*let queue = DispatchQueue.global()
+    var makeNodeModifications = false
+    
+    func backgroundComputation() {
+        queue.async {
+            
+            //map.removeChildren(in: <#T##[SKNode]#>)
+            //drawFood(earth: earth)
+            
+            self.makeNodeModifications = true
+        }
+    }*/
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //let scene = GameScene(size: view.bounds.size)
+        let scene = GameScene(size: view.bounds.size)
         let skView = view as! SKView
+        skView.preferredFramesPerSecond = 1
         skView.showsFPS = true
         skView.showsNodeCount = true
         skView.ignoresSiblingOrder = true
-        //scene.scaleMode = .resizeFill
+        scene.scaleMode = .resizeFill
+        
         
         // Ground init
         earth.sizeHorizontal = countColumns
         earth.sizeVertical = countRows
         earth.sizeTile = sizeTile
         earth.initTiles()
-        for i in 0...1000 {
-            let scene = GameScene(size: view.bounds.size)
-            scene.drawMap(earth: earth)
-            env.hourStep(map: earth)
-            skView.presentScene(scene)
-        }
+        scene.drawMap(earth: earth)
+        scene.drawFood(earth: earth)
+        skView.presentScene(scene)
     }
 
+    
+    
     override var shouldAutorotate: Bool {
         return true
     }
