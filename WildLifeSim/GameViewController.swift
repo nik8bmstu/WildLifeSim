@@ -24,7 +24,7 @@ class GameViewController: UIViewController {
         // Scene init
         let scene = GameScene(size: view.bounds.size)
         let skView = view as! SKView
-        skView.preferredFramesPerSecond = 1
+        skView.preferredFramesPerSecond = 30
         skView.showsFPS = true
         skView.showsNodeCount = true
         skView.ignoresSiblingOrder = true

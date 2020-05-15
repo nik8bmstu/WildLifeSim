@@ -14,6 +14,7 @@ struct Tile {
     var type: String
     var foodCount: Int
     var waterHere: Bool
+    var isEmpty: Bool
 }
 
 /// Ground class
@@ -23,7 +24,7 @@ class Ground {
     var sizeTile: Int = 20
     var tiles: [[Tile]] = []
     
-    let tileDefault = Tile(type: "grass", foodCount: 0, waterHere: false)
+    let tileDefault = Tile(type: "grass", foodCount: 0, waterHere: false, isEmpty: true)
     
     func initTiles() {
         self.tiles = Array(repeating: Array(repeating: tileDefault, count: sizeVertical), count: sizeHorizontal)
@@ -33,11 +34,11 @@ class Ground {
             switch rand {
             case 0, 1:
                 let food = Int.random(in: 0...3)
-                self.tiles[h][v] = Tile(type: "forest", foodCount: food, waterHere: false)
+                self.tiles[h][v] = Tile(type: "forest", foodCount: food, waterHere: false, isEmpty: false)
             case 2:
-                self.tiles[h][v] = Tile(type: "mountain", foodCount: 0, waterHere: false)
+                self.tiles[h][v] = Tile(type: "mountain", foodCount: 0, waterHere: false, isEmpty: false)
             case 3:
-                self.tiles[h][v] = Tile(type: "water", foodCount: 0, waterHere: true)
+                self.tiles[h][v] = Tile(type: "water", foodCount: 0, waterHere: true, isEmpty: false)
             default:
                 self.tiles[h][v] = tileDefault
             }

@@ -9,60 +9,81 @@
 import SpriteKit
 import GameplayKit
 
+let upRowY: CGFloat = -329
+let LeftColX: CGFloat = -465
+
 class GameScene: SKScene {
+    let map = SKNode()
+    let envInfo = SKNode()
+    var button = SKNode()
     
-    
-    // tileSprite code
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    let view2D:SKSpriteNode
-    
-    // tileMap code
-    let map = SKNode()
-    
-    // tileSprite code
+
     override init(size: CGSize) {
-        view2D = SKSpriteNode()
         super.init(size: size)
-        //self.anchorPoint = CGPoint(x:0.028, y:0.9)
-        self.anchorPoint = CGPoint(x:0.5, y:0.5)
+        self.anchorPoint = CGPoint(x:0.41, y:0.719)
     }
     
-    /// Main func
+    /// First call func
     override func didMove(to view: SKView)
     {
         SceneSetting()
-        drawEnvParameters()
-        // tileSprite code
-        /*let deviceScale = self.size.width / 6000//667
-        view2D.position = CGPoint(x: 0, y: 0)
-        view2D.xScale = deviceScale
-        view2D.yScale = deviceScale
-        addChild(view2D)
-        placeAllTiles2D()*/
+        drawEnvParameters(env: env)
     }
     
     override func update(_ currentTime: TimeInterval) {
-        env.hourStep(map: earth)
         map.removeAllChildren()
         drawMap(earth: earth)
         drawFood(earth: earth)
+        drawEnvParameters(env: env)
     }
     
-    func drawEnvParameters() {
-       var Second = SKLabelNode(text: "234345436")
-        Second.fontName = "Chalkboard SE Bold"  // задаем имя шрифта.
-        Second.fontColor = SKColor.black // задаем цвет шрифта.
-        //Second.position = CGPointMake(280, 50) // задаем позицию.
-        Second.fontSize = 20 // задаем размер шрифта.
-        Second.name = "Second" // задаем имя спрайта
-        self.addChild(Second) // добавляем наш спрайт на нашу сцену.
+    func drawEnvParameters(env: Environment) {
+        let defFontStyle = "Chalkboard SE Bold"
+        let defFontSize: CGFloat = 25
+        let defFontColor = SKColor.black
+        
+        
+        envInfo.removeAllChildren()
+        
+        let step = SKLabelNode(text: "STEP")
+        step.fontName = defFontStyle
+        step.fontSize = defFontSize
+        step.fontColor = SKColor.white
+        step.name = "step"
+        step.position = CGPoint(x: LeftColX, y: upRowY)
+        
+        let day = SKLabelNode(text: "Day: \(env.day)")
+        day.fontName = defFontStyle
+        day.fontSize = defFontSize
+        day.fontColor = SKColor.red
+        day.name = "day"
+        day.position = CGPoint(x: LeftColX + 120, y: upRowY)
+        
+        let time = SKLabelNode(text: "Time: \(env.hour):00")
+        time.fontName = defFontStyle
+        time.fontSize = defFontSize
+        time.fontColor = SKColor.red
+        time.name = "time"
+        time.position = CGPoint(x: LeftColX + 260, y: upRowY)
+        
+        let food = SKLabelNode(text: "Food: \(env.foodCount)")
+        food.fontName = defFontStyle
+        food.fontSize = defFontSize
+        food.fontColor = defFontColor
+        food.name = "food"
+        food.position = CGPoint(x: LeftColX + 410, y: upRowY)
+        
+        envInfo.addChild(step)
+        envInfo.addChild(day)
+        envInfo.addChild(time)
+        envInfo.addChild(food)
     }
     
     /// Draw earth map
     func drawMap(earth: Ground) {
-        
         // Connect Ground Tile set
         let tileSet = SKTileSet(named: "groundsSet")!
         let tileSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
@@ -73,6 +94,7 @@ class GameScene: SKScene {
         let mountainTiles = tileSet.tileGroups.first  {$0.name == "mountain"}
         // Create bottom layer
         let botLayer = SKTileMapNode(tileSet: tileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        botLayer.name = "botLayer"
         botLayer.fill(with: backgroundTiles)
         map.addChild(botLayer)
         // Create middle layer
@@ -107,6 +129,7 @@ class GameScene: SKScene {
         let food3 = foodTileSet.tileGroups.first  {$0.name == "3"}
         // Create top layer
         let topLayer = SKTileMapNode(tileSet: foodTileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        topLayer.name = "topLayer"
         // Fill map from earth
         for column in 0..<earth.sizeHorizontal {
             for row in 0..<earth.sizeVertical {
@@ -127,34 +150,6 @@ class GameScene: SKScene {
         map.addChild(topLayer)
     }
     
-    /*
-    // tileSprite code
-    func placeTile2D(image: String, withPosition: CGPoint) {
-        let tileSprite = SKSpriteNode(imageNamed: image)
-        tileSprite.position = withPosition
-        tileSprite.anchorPoint = CGPoint(x: 10.0, y: 10.0)
-        view2D.addChild(tileSprite)
-        /*guard let tileSet = SKTileSet(named: "testset") else {
-            // hint: don't use the filename for named, use the tileset inside
-            fatalError()
-        }
-        let tileSize = tileSet.defaultTileSize // from image size
-        let tileMap = SKTileMapNode(tileSet: tileSet, columns: 1, rows: 1, tileSize: tileSize)
-        let tileGroup = tileSet.tileGroups.first
-        tileMap.fill(with: tileGroup) // fill or set by column/row
-        //tileMap.setTileGroup(tileGroup, forColumn: 5, row: 5)
-        self.addChild(tileMap)*/
-    }
-    // tileSprite code
-    func placeAllTiles2D() {
-        for h in 0..<countColumns {
-            for v in 0..<countRows {
-                var point = CGPoint(x: (h * sizeTile), y: (v * sizeTile))
-                let tileName = earth.tiles[h][v].type
-                placeTile2D(image: tileName, withPosition: point)
-            }
-        }
-    }*/
     /// Settings
     func SceneSetting()
     {
@@ -163,5 +158,29 @@ class GameScene: SKScene {
         addChild(map)
         map.xScale = 0.4
         map.yScale = 0.4
+        // Create environment info labels
+        addChild(envInfo)
+        envInfo.xScale = 1
+        envInfo.yScale = 1
+        // Create Step button
+        button = SKSpriteNode(color: SKColor.red, size: CGSize(width: 150, height: 50))
+        button.position = CGPoint(x: LeftColX, y:upRowY + 9)
+        addChild(button)
+    }
+    
+    /// Step button tap function
+    func stepButtonTapped() {
+        env.hourStep(map: earth)
+    }
+    
+    /// Check taps
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touch = touches.first
+        let touchLocation = touch!.location(in: self)
+            // Check location of the touch
+            if button.contains(touchLocation) {
+                stepButtonTapped()
+            }
+
     }
 }
