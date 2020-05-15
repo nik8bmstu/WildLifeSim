@@ -173,6 +173,15 @@ class GameScene: SKScene {
         env.hourStep(map: earth)
     }
     
+    /// Map tap function
+    func mapTapped(point: CGPoint) {
+        var pointResized = CGPoint(x: point.x / map.xScale, y: point.y / map.yScale)
+        let layer = map.childNode(withName: "botLayer")! as! SKTileMapNode
+        let tapColumn = layer.tileColumnIndex(fromPosition: pointResized)
+        let tapRow = layer.tileRowIndex(fromPosition: pointResized)
+        print("Map tapped at Column: \(tapColumn) Row: \(tapRow)")
+    }
+    
     /// Check taps
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first
@@ -181,6 +190,8 @@ class GameScene: SKScene {
             if button.contains(touchLocation) {
                 stepButtonTapped()
             }
-
+        if map.contains(touchLocation) {
+            mapTapped(point: touchLocation)
+        }
     }
 }
