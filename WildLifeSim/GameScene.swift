@@ -44,7 +44,7 @@ class GameScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        env.calcFood(map: earth)
+        env.hourStep(map: earth)
         map.removeAllChildren()
         drawMap(earth: earth)
         drawFood(earth: earth)

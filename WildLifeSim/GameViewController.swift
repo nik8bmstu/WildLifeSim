@@ -17,34 +17,11 @@ let sizeTile = 90
 let earth = Ground()
 let env = Environment()
 
-/*extension GameViewController: SKSceneDelegate {
-    func update(_ currentTime: TimeInterval, for scene: SKScene) {
-        if makeNodeModifications {
-            makeNodeModifications = false
-            
-            env.calcFood(map: earth)
-        }
-    }
-}*/
-
 class GameViewController: UIViewController {
-    
-    /*let queue = DispatchQueue.global()
-    var makeNodeModifications = false
-    
-    func backgroundComputation() {
-        queue.async {
-            
-            //map.removeChildren(in: <#T##[SKNode]#>)
-            //drawFood(earth: earth)
-            
-            self.makeNodeModifications = true
-        }
-    }*/
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        // Scene init
         let scene = GameScene(size: view.bounds.size)
         let skView = view as! SKView
         skView.preferredFramesPerSecond = 1
@@ -52,7 +29,6 @@ class GameViewController: UIViewController {
         skView.showsNodeCount = true
         skView.ignoresSiblingOrder = true
         scene.scaleMode = .resizeFill
-        
         
         // Ground init
         earth.sizeHorizontal = countColumns
@@ -64,7 +40,6 @@ class GameViewController: UIViewController {
         skView.presentScene(scene)
     }
 
-    
     
     override var shouldAutorotate: Bool {
         return true

@@ -20,7 +20,16 @@ class Environment {
     
     // Logic step
     func hourStep(map: Ground) {
-        calcFood(map: map)
+        print("Time = \(hour):00")
+        hour += 1
+        if hour == 24 {
+            hour = 0
+            day += 1
+            calcFood(map: map)
+        }
+        
+        isDayTime = ((7 < hour) && (hour < 20)) ? true : false
+        
     }
     
     /// Calc food count
