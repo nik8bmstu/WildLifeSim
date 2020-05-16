@@ -50,6 +50,7 @@ class GameScene: SKScene {
     var waterTiles: SKTileGroup!
     var mountainTiles: SKTileGroup!
     var selectedTile: SKTileGroup!
+    var emptyTile: SKTileGroup!
     
     // Connect Food Tile set
     var foodTileSet = SKTileSet(named: "food")
@@ -258,24 +259,23 @@ class GameScene: SKScene {
     /// Draw select frame
     func drawSelect(col: Int, row: Int) {
         selectFrame.removeAllChildren()
+        frameLayer.fill(with: emptyTile)
         frameLayer.setTileGroup(selectedTile, forColumn: col, row: row)
+        
         selectFrame.addChild(frameLayer)
     }
     
     /// Animals init
     func animalsInit() {
-        // Connect tiles
-        //cowDown = animalTileSet!.tileGroups.first {$0.name == "cowdown"}!
         // Create layer
         animalLayer = SKTileMapNode(tileSet: animalTileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         animalLayer.name = "animalLayer"
-        //animalLayer.fill(with: cowDown)
-        //animalsMap.addChild(animalLayer)
     }
     
     /// Selection init
     func selectInit() {
         selectedTile = tileSet!.tileGroups.first  {$0.name == "frame"}!
+        emptyTile = tileSet!.tileGroups.first  {$0.name == "empty"}!
         frameLayer = SKTileMapNode(tileSet: tileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         frameLayer.name = "frameLayer"
         //frameLayer.fill(with: selectedTile)
