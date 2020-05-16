@@ -68,6 +68,7 @@ class Animal {
     var coord: Coord
     var direction: Direction = .down
     var isFemale: Bool
+    var actionPoints: Int = 6
     
     init(myCoord: Coord) {
         isFemale = Bool.random()
@@ -82,5 +83,35 @@ class Animal {
     func placeOnGround(earth: Ground) {
         earth.tiles[coord.col][coord.row].isEmpty = false
         print("Animal placed at \(coord)")
+    }
+    
+    // Actions
+    
+    ///Rotate left
+    func rotateLeft() {
+        switch direction {
+        case .down:
+            direction = .right
+        case .right:
+            direction = .up
+        case .up:
+            direction = .left
+        default:
+            direction = .down
+        }
+    }
+    
+    ///Rotate right
+    func rotateRight() {
+        switch direction {
+        case .down:
+            direction = .left
+        case .right:
+            direction = .down
+        case .up:
+            direction = .right
+        default:
+            direction = .up
+        }
     }
 }

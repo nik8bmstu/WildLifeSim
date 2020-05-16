@@ -21,16 +21,22 @@ class Environment {
     
     // Logic step
     func hourStep(map: Ground) {
-        print("Time = \(hour):00")
+        //print("Time = \(hour):00")
         hour += 1
         if hour == 24 {
             hour = 0
             day += 1
             calcFood(map: map)
         }
-        
         isDayTime = ((7 < hour) && (hour < 20)) ? true : false
-        
+        for i in 0..<animalCount {
+            switch Int.random(in: 0...1) {
+            case 1:
+                animals[i].rotateLeft()
+            default:
+                animals[i].rotateRight()
+            }
+        }
     }
     
     /// Init start animal pool

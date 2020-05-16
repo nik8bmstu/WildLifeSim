@@ -13,10 +13,12 @@ import GameplayKit
 
 class GameScene: SKScene {
     var map = SKNode()
+    var foodMap = SKNode()
     var envInfo = SKNode()
     var tileInfo = SKNode()
     var objInfo = SKNode()
     var animalsMap = SKNode()
+    var selectFrame = SKNode()
     var button = SKNode()
     
     let defFontStyle = "American Typewriter"
@@ -47,6 +49,7 @@ class GameScene: SKScene {
     var forestTiles: SKTileGroup!
     var waterTiles: SKTileGroup!
     var mountainTiles: SKTileGroup!
+    var selectedTile: SKTileGroup!
     
     // Connect Food Tile set
     var foodTileSet = SKTileSet(named: "food")
@@ -57,11 +60,6 @@ class GameScene: SKScene {
     // Connect Animal Tile set
     var animalTileSet = SKTileSet(named: "animals")
     var animalTileGroup: SKTileGroup!
-    // Cows
-    //var cowDown: SKTileGroup!
-    //var cowUp: SKTileGroup!
-    //var cowLeft: SKTileGroup!
-    //var cowRight: SKTileGroup!
     
     // Animal layer
     var animalLayer: SKTileMapNode!
@@ -70,6 +68,12 @@ class GameScene: SKScene {
     var botLayer: SKTileMapNode!
     var midLayer: SKTileMapNode!
     var topLayer: SKTileMapNode!
+    
+    // Selection layer
+    var frameLayer: SKTileMapNode!
+    
+    // Food Layer
+    var foodLayer: SKTileMapNode!
     
     // Create labels
     // Axis
@@ -97,10 +101,6 @@ class GameScene: SKScene {
 
     override init(size: CGSize) {
         super.init(size: size)
-        
-        //SceneSetting()
-        //mapInit()
-        //labelInit()
         self.anchorPoint = CGPoint(x:0.41, y:0.627)
     }
     
@@ -109,17 +109,22 @@ class GameScene: SKScene {
     {
         SceneSetting()
         mapInit()
+        foodMapInit()
         labelInit()
         animalsInit()
+        selectInit()
+        
+        drawMap(earth: earth)
     }
     
     override func update(_ currentTime: TimeInterval) {
-        drawMap(earth: earth)
+        //drawMap(earth: earth)
         drawFood(earth: earth)
         drawEnvParameters(env: env)
         drawCurrentTileParam(earth: earth)
         drawCurrentObjectParam(earth: earth, env: env)
         drawAnimals(env: env)
+        drawSelect(col: tapColumn, row: tapRow)
     }
     
     /// Draw environment parameters
@@ -190,8 +195,9 @@ class GameScene: SKScene {
             if curTile.meatCount == 0 {
                 let coord = Coord(col: tapColumn, row: tapRow)
                 let index = env.getAnimalIndex(coord: coord)
-                let gender = env.animals[index].isFemale ? " ♀" : " ♂"
-                animalName.text = env.animals[index].name + gender
+                let color = env.animals[index].isFemale ? SKColor.systemPink : SKColor.systemBlue
+                animalName.text = env.animals[index].name
+                animalName.fontColor = color
                 animalSize.text = env.animals[index].type.label + "- " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
                 objInfo.addChild(animalLabel)
                 objInfo.addChild(animalName)
@@ -226,8 +232,9 @@ class GameScene: SKScene {
         map.addChild(midLayer)
     }
     
-    /// Draw food on map
-    func drawFood (earth: Ground) {
+    /// Draw food  map
+    func drawFood(earth: Ground) {
+        foodMap.removeAllChildren()
         // Fill map from earth
         for column in 0..<earth.sizeHorizontal {
             for row in 0..<earth.sizeVertical {
@@ -235,17 +242,24 @@ class GameScene: SKScene {
                 //print("at \(column), \(row) - \(tileName)")
                 switch foodCount {
                 case 1:
-                    topLayer.setTileGroup(food1, forColumn: column, row: row)
+                    foodLayer.setTileGroup(food1, forColumn: column, row: row)
                 case 2:
-                    topLayer.setTileGroup(food2, forColumn: column, row: row)
+                    foodLayer.setTileGroup(food2, forColumn: column, row: row)
                 case 3:
-                    topLayer.setTileGroup(food3, forColumn: column, row: row)
+                    foodLayer.setTileGroup(food3, forColumn: column, row: row)
                 default:
                     _ = 0
                 }
             }
         }
-        map.addChild(topLayer)
+        foodMap.addChild(foodLayer)
+    }
+    
+    /// Draw select frame
+    func drawSelect(col: Int, row: Int) {
+        selectFrame.removeAllChildren()
+        frameLayer.setTileGroup(selectedTile, forColumn: col, row: row)
+        selectFrame.addChild(frameLayer)
     }
     
     /// Animals init
@@ -259,6 +273,15 @@ class GameScene: SKScene {
         //animalsMap.addChild(animalLayer)
     }
     
+    /// Selection init
+    func selectInit() {
+        selectedTile = tileSet!.tileGroups.first  {$0.name == "frame"}!
+        frameLayer = SKTileMapNode(tileSet: tileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        frameLayer.name = "frameLayer"
+        //frameLayer.fill(with: selectedTile)
+        //selectFrame.addChild(frameLayer)
+    }
+    
     /// Map Init
     func mapInit() {
         // Connect ground tiles
@@ -267,10 +290,6 @@ class GameScene: SKScene {
         forestTiles = tileSet!.tileGroups.first  {$0.name == "forest"}!
         waterTiles = tileSet!.tileGroups.first  {$0.name == "water"}!
         mountainTiles = tileSet!.tileGroups.first  {$0.name == "mountain"}!
-        // Connect food
-        food1 = foodTileSet!.tileGroups.first  {$0.name == "1"}!
-        food2 = foodTileSet!.tileGroups.first  {$0.name == "2"}!
-        food3 = foodTileSet!.tileGroups.first  {$0.name == "3"}!
         // Create map layers
         botLayer = SKTileMapNode(tileSet: tileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         midLayer = SKTileMapNode(tileSet: tileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
@@ -279,6 +298,17 @@ class GameScene: SKScene {
         midLayer.name = "midLayer"
         botLayer.name = "botLayer"
         botLayer.fill(with: backgroundTiles)
+    }
+    
+    /// Food map Init
+    func foodMapInit() {
+        // Connect food
+        food1 = foodTileSet!.tileGroups.first  {$0.name == "1"}!
+        food2 = foodTileSet!.tileGroups.first  {$0.name == "2"}!
+        food3 = foodTileSet!.tileGroups.first  {$0.name == "3"}!
+        // Create map layers
+        foodLayer = SKTileMapNode(tileSet: foodTileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        foodLayer.name = "foodLayer"
     }
     
     /// Init labels
@@ -415,6 +445,10 @@ class GameScene: SKScene {
         addChild(map)
         map.xScale = 0.4
         map.yScale = 0.4
+        // Create food map
+        addChild(foodMap)
+        foodMap.xScale = 0.4
+        foodMap.yScale = 0.4
         // Create environment info labels
         addChild(envInfo)
         envInfo.xScale = 1
@@ -431,6 +465,10 @@ class GameScene: SKScene {
         addChild(animalsMap)
         animalsMap.xScale = 0.4
         animalsMap.yScale = 0.4
+        // Create frame
+        addChild(selectFrame)
+        selectFrame.xScale = 0.4
+        selectFrame.yScale = 0.4
         // Create Step button
         button = SKSpriteNode(color: SKColor.red, size: CGSize(width: 150, height: 50))
         button.position = CGPoint(x: statusX, y:statusY + 9)
