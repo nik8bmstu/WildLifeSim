@@ -11,18 +11,27 @@ import Foundation
 let mediumSizeMin = 50
 let mediumSizeMax = 75
 
-enum SizeType: String {
-    case small
-    case medium
-    case big
+enum Type: String {
+    case cow = "cow"
+    case horse = "horse"
+    case elephant = "elephant"
     
-    var rawValue: String {
+    var label: String {
         switch self {
-        case .small: return "Маленькое "
-        case .medium: return "Среднее "
-        case .big: return "Большое "
+        case .cow:
+            return "Корова "
+        case .horse:
+            return "Лошадь "
+        case .elephant:
+            return "Слон "
         }
     }
+}
+    
+enum SizeType: String {
+    case small = "S"
+    case medium = "M"
+    case big = "B"
 }
 
 enum Direction: String {
@@ -46,14 +55,15 @@ struct Coord {
     var row: Int
 }
 
-let maleNames: [String] = ["Ричард", "Сэм", "Томас", "Чак"]
-let femaleNames: [String] = ["София", "Дейзи", "Кара", "Дора"]
+let maleNames: [String] = ["Ричард", "Сэм", "Томас", "Чак", "Говард", "Игнасио", "Клайд", "Снежок"]
+let femaleNames: [String] = ["София", "Дейзи", "Кара", "Дора", "Бонни", "Сара", "Мэри", "Люси"]
 
 class Animal {
     var id: Int = 1
     var name: String
     var size: Int = 50
     var sizeType: SizeType = .medium
+    var type: Type = .cow
     var age: Int = 0
     var coord: Coord
     var direction: Direction = .down

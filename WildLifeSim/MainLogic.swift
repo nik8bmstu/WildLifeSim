@@ -41,7 +41,7 @@ class Environment {
             var newAnimal = Animal(myCoord: coord)
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
-            newAnimal.id = i + 1
+            newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
             animalCount += 1
             animals.append(newAnimal)

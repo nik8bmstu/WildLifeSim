@@ -183,8 +183,9 @@ class GameScene: SKScene {
             if curTile.meatCount == 0 {
                 let coord = Coord(col: tapColumn, row: tapRow)
                 let index = env.getAnimalIndex(coord: coord)
-                animalName.text = env.animals[index].name
-                animalSize.text = env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
+                let gender = env.animals[index].isFemale ? " ♀" : " ♂"
+                animalName.text = env.animals[index].name + gender
+                animalSize.text = env.animals[index].type.label + "- " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
                 objInfo.addChild(animalLabel)
                 objInfo.addChild(animalName)
                 objInfo.addChild(animalSize)
@@ -243,7 +244,7 @@ class GameScene: SKScene {
     /// Animals init
     func animalsInit() {
         // Connect tiles
-        cowDown = animalTileSet!.tileGroups.first {$0.name == "cowDown"}!
+        cowDown = animalTileSet!.tileGroups.first {$0.name == "cowdown"}!
         // Create layer
         animalLayer = SKTileMapNode(tileSet: animalTileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         animalLayer.name = "animalLayer"
