@@ -19,6 +19,7 @@
 		244D07EF246E10EC00003CC7 /* FoodTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 244D07EE246E10EC00003CC7 /* FoodTileSet.sks */; };
 		246351EF246EE615009B3C34 /* MainLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246351EE246EE615009B3C34 /* MainLogic.swift */; };
 		246351F124701894009B3C34 /* ClassAnimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246351F024701894009B3C34 /* ClassAnimal.swift */; };
+		246351F524703C7E009B3C34 /* AnimalTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 246351F424703C7E009B3C34 /* AnimalTileSet.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		244D07EE246E10EC00003CC7 /* FoodTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = FoodTileSet.sks; sourceTree = "<group>"; };
 		246351EE246EE615009B3C34 /* MainLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainLogic.swift; sourceTree = "<group>"; };
 		246351F024701894009B3C34 /* ClassAnimal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassAnimal.swift; sourceTree = "<group>"; };
+		246351F424703C7E009B3C34 /* AnimalTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = AnimalTileSet.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 				246351EE246EE615009B3C34 /* MainLogic.swift */,
 				244D07EC246E058500003CC7 /* GroundTileSet.sks */,
 				244D07EE246E10EC00003CC7 /* FoodTileSet.sks */,
+				246351F424703C7E009B3C34 /* AnimalTileSet.sks */,
 				244C2F1D246DC5AA0085E1BB /* ClassGround.swift */,
 				244C2F0D246D95060085E1BB /* GameViewController.swift */,
 				244C2F0F246D95060085E1BB /* Main.storyboard */,
@@ -147,6 +150,7 @@
 				244C2F13246D95090085E1BB /* Assets.xcassets in Resources */,
 				244D07EF246E10EC00003CC7 /* FoodTileSet.sks in Resources */,
 				244C2F16246D95090085E1BB /* LaunchScreen.storyboard in Resources */,
+				246351F524703C7E009B3C34 /* AnimalTileSet.sks in Resources */,
 				244C2F0A246D95060085E1BB /* Actions.sks in Resources */,
 				244D07ED246E058500003CC7 /* GroundTileSet.sks in Resources */,
 			);

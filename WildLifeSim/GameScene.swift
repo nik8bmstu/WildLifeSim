@@ -16,6 +16,7 @@ class GameScene: SKScene {
     var envInfo = SKNode()
     var tileInfo = SKNode()
     var objInfo = SKNode()
+    var animalsMap = SKNode()
     var button = SKNode()
     
     let defFontStyle = "American Typewriter"
@@ -52,6 +53,13 @@ class GameScene: SKScene {
     var food1: SKTileGroup!
     var food2: SKTileGroup!
     var food3: SKTileGroup!
+    
+    // Connect Animal Tile set
+    var animalTileSet = SKTileSet(named: "animals")
+    var cowDown: SKTileGroup!
+    
+    // Animal layer
+    var animalLayer: SKTileMapNode!
     
     // Create map layers
     var botLayer: SKTileMapNode!
@@ -97,6 +105,7 @@ class GameScene: SKScene {
         SceneSetting()
         mapInit()
         labelInit()
+        animalsInit()
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -105,6 +114,7 @@ class GameScene: SKScene {
         drawEnvParameters(env: env)
         drawCurrentTileParam(earth: earth)
         drawCurrentObjectParam(earth: earth, env: env)
+        drawAnimals(env: env)
     }
     
     /// Draw environment parameters
@@ -136,7 +146,7 @@ class GameScene: SKScene {
         let addr = transformCoord(col: tapColumn, row: tapRow)
         let curTile = earth.tiles[tapColumn][tapRow]
         tileLabel.text = "Клетка: \(addr)"
-        tileType.text = earth.getTileType(col: tapColumn, row: tapRow)
+        tileType.text = earth.tiles[tapColumn][tapRow].type.rawValue
         tileFood.text = "Еды: " + "\(curTile.foodCount)"
         tileAcess.text = curTile.isAcessable ? "Проходима" : "Не проходима"
         if curTile.isEmpty {
@@ -152,6 +162,17 @@ class GameScene: SKScene {
         tileInfo.addChild(tileType)
         tileInfo.addChild(tileAcess)
         tileInfo.addChild(tileEmpty)
+    }
+    
+    /// Draw animals
+    func drawAnimals(env: Environment) {
+        animalsMap.removeAllChildren()
+        // Place all animals
+        for i in 0..<env.animalCount {
+            let coord = env.animals[i].coord
+            animalLayer.setTileGroup(cowDown, forColumn: coord.col, row: coord.row)
+        }
+        animalsMap.addChild(animalLayer)
     }
     
     /// Draw current object param
@@ -183,11 +204,11 @@ class GameScene: SKScene {
                 let tileName = earth.tiles[column][row].type
                 //print("at \(column), \(row) - \(tileName)")
                 switch tileName {
-                case "water":
+                case .water:
                     midLayer.setTileGroup(waterTiles, forColumn: column, row: row)
-                case "forest":
+                case .forest:
                     midLayer.setTileGroup(forestTiles, forColumn: column, row: row)
-                case "mountain":
+                case .mountain:
                     midLayer.setTileGroup(mountainTiles, forColumn: column, row: row)
                 default:
                     midLayer.setTileGroup(grassTiles, forColumn: column, row: row)
@@ -217,6 +238,17 @@ class GameScene: SKScene {
             }
         }
         map.addChild(topLayer)
+    }
+    
+    /// Animals init
+    func animalsInit() {
+        // Connect tiles
+        cowDown = animalTileSet!.tileGroups.first {$0.name == "cowDown"}!
+        // Create layer
+        animalLayer = SKTileMapNode(tileSet: animalTileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        animalLayer.name = "animalLayer"
+        //animalLayer.fill(with: cowDown)
+        //animalsMap.addChild(animalLayer)
     }
     
     /// Map Init
@@ -387,6 +419,10 @@ class GameScene: SKScene {
         addChild(objInfo)
         objInfo.xScale = 1
         objInfo.yScale = 1
+        // Create animal
+        addChild(animalsMap)
+        animalsMap.xScale = 0.4
+        animalsMap.yScale = 0.4
         // Create Step button
         button = SKSpriteNode(color: SKColor.red, size: CGSize(width: 150, height: 50))
         button.position = CGPoint(x: statusX, y:statusY + 9)

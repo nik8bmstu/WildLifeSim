@@ -76,7 +76,7 @@ class Environment {
             for row in 0..<map.sizeVertical {
                 let currentTileFood = map.tiles[column][row].foodCount
                 let currentTileType = map.tiles[column][row].type
-                if currentTileType == "forest" {
+                if currentTileType == .forest {
                     var newTileFood = 0
                     let chance = Int.random(in: 0...100)
                     switch currentTileFood {

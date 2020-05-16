@@ -18,9 +18,25 @@ enum SizeType: String {
     
     var rawValue: String {
         switch self {
-            case .small: return "Маленькое "
-            case .medium: return "Среднее "
-            case .big: return "Большое "
+        case .small: return "Маленькое "
+        case .medium: return "Среднее "
+        case .big: return "Большое "
+        }
+    }
+}
+
+enum Direction: String {
+    case down
+    case up
+    case left
+    case right
+    
+    var rawValue: String {
+        switch self {
+        case .down: return "down"
+        case .up: return "up"
+        case .left: return "left"
+        case .right: return "right"
         }
     }
 }
@@ -37,6 +53,7 @@ class Animal {
     var sizeType: SizeType = .medium
     var age: Int = 0
     var coord: Coord
+    var direction: Direction = .down
     
     init(myName: String, myCoord: Coord) {
         coord = myCoord
