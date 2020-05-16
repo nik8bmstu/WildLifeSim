@@ -9,13 +9,53 @@
 import SpriteKit
 import GameplayKit
 
-let upRowY: CGFloat = -329
-let LeftColX: CGFloat = -465
+
 
 class GameScene: SKScene {
-    let map = SKNode()
-    let envInfo = SKNode()
+    var map = SKNode()
+    var envInfo = SKNode()
+    var tileInfo = SKNode()
     var button = SKNode()
+    
+    let defFontStyle = "American Typewriter"
+    let defFontSize: CGFloat = 25
+    let defFontColor = SKColor.black
+
+    let upRowY: CGFloat = -329
+    let leftColX: CGFloat = -465
+
+    let rightColX: CGFloat = 620
+    let rightColY: CGFloat = 245
+
+    var tapColumn = 0
+    var tapRow = 0
+    
+    // Connect Ground Tile set
+    var tileSet = SKTileSet(named: "groundsSet")
+    var tileSize: CGSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
+    var backgroundTiles: SKTileGroup!
+    var grassTiles: SKTileGroup!
+    var forestTiles: SKTileGroup!
+    var waterTiles: SKTileGroup!
+    var mountainTiles: SKTileGroup!
+    
+    // Connect Food Tile set
+    var foodTileSet = SKTileSet(named: "food")
+    var food1: SKTileGroup!
+    var food2: SKTileGroup!
+    var food3: SKTileGroup!
+    
+    // Create map layers
+    var botLayer: SKTileMapNode!
+    var midLayer: SKTileMapNode!
+    var topLayer: SKTileMapNode!
+    
+    // Create labels
+    var step = SKLabelNode(text: "ШАГ")
+    var day = SKLabelNode(text: "День: 0")
+    var time = SKLabelNode(text: "Время: 00:00")
+    var food = SKLabelNode(text: "Еда: 0")
+    var tileLabel = SKLabelNode(text: "Клетка: 0, 0")
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -23,58 +63,38 @@ class GameScene: SKScene {
 
     override init(size: CGSize) {
         super.init(size: size)
+        
+        SceneSetting()
+        mapInit()
+        labelInit()
         self.anchorPoint = CGPoint(x:0.41, y:0.719)
     }
     
     /// First call func
     override func didMove(to view: SKView)
     {
-        SceneSetting()
-        drawEnvParameters(env: env)
+        //SceneSetting()
+        //mapInit()
+        //labelInit()
+        //drawEnvParameters(env: env)
+        //drawCurrentTileParam(earth: earth)
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
-        map.removeAllChildren()
         drawMap(earth: earth)
         drawFood(earth: earth)
         drawEnvParameters(env: env)
+        drawCurrentTileParam(earth: earth)
     }
     
+    /// Draw environment parameters
     func drawEnvParameters(env: Environment) {
-        let defFontStyle = "Chalkboard SE Bold"
-        let defFontSize: CGFloat = 25
-        let defFontColor = SKColor.black
-        
-        
         envInfo.removeAllChildren()
         
-        let step = SKLabelNode(text: "STEP")
-        step.fontName = defFontStyle
-        step.fontSize = defFontSize
-        step.fontColor = SKColor.white
-        step.name = "step"
-        step.position = CGPoint(x: LeftColX, y: upRowY)
-        
-        let day = SKLabelNode(text: "Day: \(env.day)")
-        day.fontName = defFontStyle
-        day.fontSize = defFontSize
-        day.fontColor = SKColor.red
-        day.name = "day"
-        day.position = CGPoint(x: LeftColX + 120, y: upRowY)
-        
-        let time = SKLabelNode(text: "Time: \(env.hour):00")
-        time.fontName = defFontStyle
-        time.fontSize = defFontSize
-        time.fontColor = SKColor.red
-        time.name = "time"
-        time.position = CGPoint(x: LeftColX + 260, y: upRowY)
-        
-        let food = SKLabelNode(text: "Food: \(env.foodCount)")
-        food.fontName = defFontStyle
-        food.fontSize = defFontSize
-        food.fontColor = defFontColor
-        food.name = "food"
-        food.position = CGPoint(x: LeftColX + 410, y: upRowY)
+        day.text = "День: \(env.day)"
+        time.text = "Время: \(env.hour):00"
+        food.text = "Еда: \(env.foodCount)"
         
         envInfo.addChild(step)
         envInfo.addChild(day)
@@ -82,24 +102,20 @@ class GameScene: SKScene {
         envInfo.addChild(food)
     }
     
+    /// Draw current taped tile parameters
+    func drawCurrentTileParam(earth: Ground) {
+        tileInfo.removeAllChildren()
+        
+        tileLabel.text = "Клетка: \(tapColumn), \(tapRow)"
+        
+        tileInfo.addChild(tileLabel)
+    }
+    
     /// Draw earth map
     func drawMap(earth: Ground) {
-        // Connect Ground Tile set
-        let tileSet = SKTileSet(named: "groundsSet")!
-        let tileSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
-        let backgroundTiles = tileSet.tileGroups.first  {$0.name == "background"}
-        let grassTiles = tileSet.tileGroups.first  {$0.name == "grass"}
-        let forestTiles = tileSet.tileGroups.first  {$0.name == "forest"}
-        let waterTiles = tileSet.tileGroups.first  {$0.name == "water"}
-        let mountainTiles = tileSet.tileGroups.first  {$0.name == "mountain"}
-        // Create bottom layer
-        let botLayer = SKTileMapNode(tileSet: tileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
-        botLayer.name = "botLayer"
-        botLayer.fill(with: backgroundTiles)
+        map.removeAllChildren()
         map.addChild(botLayer)
-        // Create middle layer
-        let midLayer = SKTileMapNode(tileSet: tileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
-        // Fill map from earth
+        // Fill middle map layer from earth
         for column in 0..<earth.sizeHorizontal {
             for row in 0..<earth.sizeVertical {
                 let tileName = earth.tiles[column][row].type
@@ -117,19 +133,10 @@ class GameScene: SKScene {
             }
         }
         map.addChild(midLayer)
-        
     }
+    
     /// Draw food on map
-    func drawFood (earth: Ground){
-        // Connect Food Tile set
-        let tileSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
-        let foodTileSet = SKTileSet(named: "food")!
-        let food1 = foodTileSet.tileGroups.first  {$0.name == "1"}
-        let food2 = foodTileSet.tileGroups.first  {$0.name == "2"}
-        let food3 = foodTileSet.tileGroups.first  {$0.name == "3"}
-        // Create top layer
-        let topLayer = SKTileMapNode(tileSet: foodTileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
-        topLayer.name = "topLayer"
+    func drawFood (earth: Ground) {
         // Fill map from earth
         for column in 0..<earth.sizeHorizontal {
             for row in 0..<earth.sizeVertical {
@@ -150,6 +157,62 @@ class GameScene: SKScene {
         map.addChild(topLayer)
     }
     
+    /// Map Init
+    func mapInit() {
+        // Connect ground tiles
+        backgroundTiles = tileSet!.tileGroups.first  {$0.name == "background"}!
+        grassTiles = tileSet!.tileGroups.first  {$0.name == "grass"}!
+        forestTiles = tileSet!.tileGroups.first  {$0.name == "forest"}!
+        waterTiles = tileSet!.tileGroups.first  {$0.name == "water"}!
+        mountainTiles = tileSet!.tileGroups.first  {$0.name == "mountain"}!
+        // Connect food
+        food1 = foodTileSet!.tileGroups.first  {$0.name == "1"}!
+        food2 = foodTileSet!.tileGroups.first  {$0.name == "2"}!
+        food3 = foodTileSet!.tileGroups.first  {$0.name == "3"}!
+        // Create map layers
+        botLayer = SKTileMapNode(tileSet: tileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        midLayer = SKTileMapNode(tileSet: tileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        topLayer = SKTileMapNode(tileSet: foodTileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        topLayer.name = "topLayer"
+        midLayer.name = "midLayer"
+        botLayer.name = "botLayer"
+        botLayer.fill(with: backgroundTiles)
+    }
+    
+    /// Init labels
+    func labelInit() {
+        step.text = "ШАГ"
+        step.fontName = defFontStyle
+        step.fontSize = defFontSize
+        step.fontColor = SKColor.white
+        step.name = "step"
+        step.position = CGPoint(x: leftColX, y: upRowY)
+        
+        day.fontName = defFontStyle
+        day.fontSize = defFontSize
+        day.fontColor = SKColor.red
+        day.name = "day"
+        day.position = CGPoint(x: leftColX + 130, y: upRowY)
+        
+        time.fontName = defFontStyle
+        time.fontSize = defFontSize
+        time.fontColor = SKColor.red
+        time.name = "time"
+        time.position = CGPoint(x: leftColX + 285, y: upRowY)
+        
+        food.fontName = defFontStyle
+        food.fontSize = defFontSize
+        food.fontColor = defFontColor
+        food.name = "food"
+        food.position = CGPoint(x: leftColX + 430, y: upRowY)
+        
+        tileLabel.fontName = defFontStyle
+        tileLabel.fontSize = defFontSize
+        tileLabel.fontColor = defFontColor
+        tileLabel.name = "tileLabel"
+        tileLabel.position = CGPoint(x: rightColX, y: rightColY)
+    }
+    
     /// Settings
     func SceneSetting()
     {
@@ -162,11 +225,22 @@ class GameScene: SKScene {
         addChild(envInfo)
         envInfo.xScale = 1
         envInfo.yScale = 1
+        // Create tile info labels
+        addChild(tileInfo)
+        tileInfo.xScale = 1
+        tileInfo.yScale = 1
         // Create Step button
         button = SKSpriteNode(color: SKColor.red, size: CGSize(width: 150, height: 50))
-        button.position = CGPoint(x: LeftColX, y:upRowY + 9)
+        button.position = CGPoint(x: leftColX, y:upRowY + 9)
         addChild(button)
     }
+    /*
+    /// Prepare map
+    func prepareMap(earth: Ground) {
+        let newLayer = SKTileMapNode(tileSet: tileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
+        newLayer.fill(with: backgroundTiles)
+        map.addChild(newLayer)
+    }*/
     
     /// Step button tap function
     func stepButtonTapped() {
@@ -175,11 +249,11 @@ class GameScene: SKScene {
     
     /// Map tap function
     func mapTapped(point: CGPoint) {
-        var pointResized = CGPoint(x: point.x / map.xScale, y: point.y / map.yScale)
+        let pointResized = CGPoint(x: point.x / map.xScale, y: point.y / map.yScale)
         let layer = map.childNode(withName: "botLayer")! as! SKTileMapNode
-        let tapColumn = layer.tileColumnIndex(fromPosition: pointResized)
-        let tapRow = layer.tileRowIndex(fromPosition: pointResized)
-        print("Map tapped at Column: \(tapColumn) Row: \(tapRow)")
+        tapColumn = layer.tileColumnIndex(fromPosition: pointResized)
+        tapRow = layer.tileRowIndex(fromPosition: pointResized)
+        //print("Map tapped at Column: \(tapColumn) Row: \(tapRow)")
     }
     
     /// Check taps
