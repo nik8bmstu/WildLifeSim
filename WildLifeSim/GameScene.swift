@@ -15,6 +15,7 @@ class GameScene: SKScene {
     var map = SKNode()
     var envInfo = SKNode()
     var tileInfo = SKNode()
+    var objInfo = SKNode()
     var button = SKNode()
     
     let defFontStyle = "American Typewriter"
@@ -73,7 +74,7 @@ class GameScene: SKScene {
     var tileAcess = SKLabelNode(text: "Проходима")
     var tileEmpty = SKLabelNode(text: "Свободна")
     // Animal
-    //
+    var animalLabel = SKLabelNode(text: "Животное:")
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -101,6 +102,7 @@ class GameScene: SKScene {
         drawFood(earth: earth)
         drawEnvParameters(env: env)
         drawCurrentTileParam(earth: earth)
+        drawCurrentObjectParam(earth: earth)
     }
     
     /// Draw environment parameters
@@ -148,6 +150,19 @@ class GameScene: SKScene {
         tileInfo.addChild(tileType)
         tileInfo.addChild(tileAcess)
         tileInfo.addChild(tileEmpty)
+    }
+    
+    /// Draw current object param
+    func drawCurrentObjectParam(earth: Ground) {
+        objInfo.removeAllChildren()
+        let curTile = earth.tiles[tapColumn][tapRow]
+        if !curTile.isEmpty {
+            if curTile.meatCount == 0 {
+                objInfo.addChild(animalLabel)
+            } else {
+                
+            }
+        }
     }
     
     /// Draw earth map
@@ -318,6 +333,14 @@ class GameScene: SKScene {
         tileEmpty.name = "tileEmpty"
         tileEmpty.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 4)
         tileEmpty.horizontalAlignmentMode = .left
+        
+        // Animal Label
+        animalLabel.fontName = defFontStyle
+        animalLabel.fontSize = defFontSize
+        animalLabel.fontColor = SKColor.orange
+        animalLabel.name = "animalLabel"
+        animalLabel.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 6)
+        animalLabel.horizontalAlignmentMode = .left
     }
     
     /// Settings
@@ -336,6 +359,10 @@ class GameScene: SKScene {
         addChild(tileInfo)
         tileInfo.xScale = 1
         tileInfo.yScale = 1
+        // Create object info labels
+        addChild(objInfo)
+        objInfo.xScale = 1
+        objInfo.yScale = 1
         // Create Step button
         button = SKSpriteNode(color: SKColor.red, size: CGSize(width: 150, height: 50))
         button.position = CGPoint(x: statusX, y:statusY + 9)
