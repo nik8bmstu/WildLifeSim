@@ -15,6 +15,8 @@ struct Tile {
     var foodCount: Int
     var waterHere: Bool
     var isEmpty: Bool
+    var isAcessable: Bool
+    var meatCount: Int
 }
 
 /// Ground class
@@ -23,8 +25,9 @@ class Ground {
     var sizeVertical: Int = 20
     var sizeTile: Int = 20
     var tiles: [[Tile]] = []
+    var initFoodCount: Int = 0
     
-    let tileDefault = Tile(type: "grass", foodCount: 0, waterHere: false, isEmpty: true)
+    let tileDefault = Tile(type: "grass", foodCount: 0, waterHere: false, isEmpty: true, isAcessable: true, meatCount: 0)
     
     func initTiles() {
         self.tiles = Array(repeating: Array(repeating: tileDefault, count: sizeVertical), count: sizeHorizontal)
@@ -34,15 +37,30 @@ class Ground {
             switch rand {
             case 0, 1:
                 let food = Int.random(in: 0...3)
-                self.tiles[h][v] = Tile(type: "forest", foodCount: food, waterHere: false, isEmpty: false)
+                initFoodCount += food
+                self.tiles[h][v] = Tile(type: "forest", foodCount: food, waterHere: false, isEmpty: true, isAcessable: false, meatCount: 0)
             case 2:
-                self.tiles[h][v] = Tile(type: "mountain", foodCount: 0, waterHere: false, isEmpty: false)
+                self.tiles[h][v] = Tile(type: "mountain", foodCount: 0, waterHere: false, isEmpty: true, isAcessable: false, meatCount: 0)
             case 3:
-                self.tiles[h][v] = Tile(type: "water", foodCount: 0, waterHere: true, isEmpty: false)
+                self.tiles[h][v] = Tile(type: "water", foodCount: 0, waterHere: true, isEmpty: true, isAcessable: false, meatCount: 0)
             default:
                 self.tiles[h][v] = tileDefault
             }
             }
+        }
+    }
+    
+    func getTileType(col: Int, row: Int) -> String {
+        let engType = self.tiles[col][row].type
+        switch engType {
+        case "forest":
+            return "Лес"
+        case "mountain":
+            return "Гора"
+        case "water":
+            return "Вода"
+        default:
+            return "Трава"
         }
     }
     

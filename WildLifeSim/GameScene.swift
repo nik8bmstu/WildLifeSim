@@ -30,7 +30,7 @@ class GameScene: SKScene {
     let axisHX: CGFloat = -522
     let axisHY: CGFloat = 363
     
-    let axisVX: CGFloat = -542
+    let axisVX: CGFloat = -550
     let axisVY: CGFloat = 335
 
     var tapColumn = 0
@@ -58,13 +58,22 @@ class GameScene: SKScene {
     var topLayer: SKTileMapNode!
     
     // Create labels
+    // Axis
     var axisHLabels: [SKLabelNode] = []
     var axisVLabels: [SKLabelNode] = []
+    // Status
     var step = SKLabelNode(text: "ШАГ")
     var day = SKLabelNode(text: "День: 0")
     var time = SKLabelNode(text: "Время: 00:00")
     var food = SKLabelNode(text: "Еда: 0")
+    // Tile
     var tileLabel = SKLabelNode(text: "Клетка: A1")
+    var tileType = SKLabelNode(text: "Поверхность")
+    var tileFood = SKLabelNode(text: "Еда: 0")
+    var tileAcess = SKLabelNode(text: "Проходима")
+    var tileEmpty = SKLabelNode(text: "Свободна")
+    // Animal
+    //
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -120,9 +129,25 @@ class GameScene: SKScene {
     func drawCurrentTileParam(earth: Ground) {
         tileInfo.removeAllChildren()
         
-        tileLabel.text = "Клетка: \(tapColumn), \(tapRow)"
+        let addr = transformCoord(col: tapColumn, row: tapRow)
+        let curTile = earth.tiles[tapColumn][tapRow]
+        tileLabel.text = "Клетка: \(addr)"
+        tileType.text = earth.getTileType(col: tapColumn, row: tapRow)
+        tileFood.text = "Еды: " + "\(curTile.foodCount)"
+        tileAcess.text = curTile.isAcessable ? "Проходима" : "Не проходима"
+        if curTile.isEmpty {
+            tileEmpty.text = "Свободна"
+        } else if curTile.meatCount == 0 {
+            tileEmpty.text = "Занята животным"
+        } else {
+            tileEmpty.text = "Занята мясом"
+        }
         
+        tileInfo.addChild(tileFood)
         tileInfo.addChild(tileLabel)
+        tileInfo.addChild(tileType)
+        tileInfo.addChild(tileAcess)
+        tileInfo.addChild(tileEmpty)
     }
     
     /// Draw earth map
@@ -211,16 +236,17 @@ class GameScene: SKScene {
         // Vertical axis labelse
         for i in 0..<earth.sizeVertical {
             // We must create new label at each iteration
-            let label = SKLabelNode(text: "\(i + 1)")
+            let s = String(UnicodeScalar(UInt8(65 + i)))
+            let label = SKLabelNode(text: s)
             label.fontName = defFontStyle
             label.fontSize = 15
             label.fontColor = defFontColor
             label.name = "axisVLabels[\(i)]"
             label.position = CGPoint(x: axisVX, y: axisVY - 35.95 * CGFloat(i))
-            label.horizontalAlignmentMode = .right
+            label.horizontalAlignmentMode = .center
             axisVLabels.append(label)
         }
-        
+        // Button STEP
         step.text = "ШАГ"
         step.fontName = defFontStyle
         step.fontSize = defFontSize
@@ -228,6 +254,7 @@ class GameScene: SKScene {
         step.name = "step"
         step.position = CGPoint(x: statusX, y: statusY)
         
+        // Status Day
         day.fontName = defFontStyle
         day.fontSize = defFontSize
         day.fontColor = defFontColor
@@ -235,6 +262,7 @@ class GameScene: SKScene {
         day.position = CGPoint(x: statusX + 100, y: statusY)
         day.horizontalAlignmentMode = .left
         
+        // Status Time
         time.fontName = defFontStyle
         time.fontSize = defFontSize
         time.fontColor = defFontColor
@@ -242,6 +270,7 @@ class GameScene: SKScene {
         time.position = CGPoint(x: statusX + 230, y: statusY)
         time.horizontalAlignmentMode = .left
         
+        // Status Total food
         food.fontName = defFontStyle
         food.fontSize = defFontSize
         food.fontColor = defFontColor
@@ -249,12 +278,46 @@ class GameScene: SKScene {
         food.position = CGPoint(x: statusX + 430, y: statusY)
         food.horizontalAlignmentMode = .left
         
+        // Tile coord
         tileLabel.fontName = defFontStyle
         tileLabel.fontSize = defFontSize
-        tileLabel.fontColor = defFontColor
+        tileLabel.fontColor = SKColor.blue
         tileLabel.name = "tileLabel"
         tileLabel.position = CGPoint(x: tileX, y: tileY)
         tileLabel.horizontalAlignmentMode = .left
+        
+        let rightVertOffset: CGFloat = 30
+        // Tile Type
+        tileType.fontName = defFontStyle
+        tileType.fontSize = defFontSize - 5
+        tileType.fontColor = defFontColor
+        tileType.name = "tileType"
+        tileType.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 1)
+        tileType.horizontalAlignmentMode = .left
+        
+        // Tile food
+        tileFood.fontName = defFontStyle
+        tileFood.fontSize = defFontSize - 5
+        tileFood.fontColor = defFontColor
+        tileFood.name = "tileFood"
+        tileFood.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 2)
+        tileFood.horizontalAlignmentMode = .left
+        
+        // Tile acess
+        tileAcess.fontName = defFontStyle
+        tileAcess.fontSize = defFontSize - 5
+        tileAcess.fontColor = defFontColor
+        tileAcess.name = "tileAcess"
+        tileAcess.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 3)
+        tileAcess.horizontalAlignmentMode = .left
+        
+        // Tile empty
+        tileEmpty.fontName = defFontStyle
+        tileEmpty.fontSize = defFontSize - 5
+        tileEmpty.fontColor = defFontColor
+        tileEmpty.name = "tileEmpty"
+        tileEmpty.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 4)
+        tileEmpty.horizontalAlignmentMode = .left
     }
     
     /// Settings
@@ -305,5 +368,11 @@ class GameScene: SKScene {
         if map.contains(touchLocation) {
             mapTapped(point: touchLocation)
         }
+    }
+    
+    /// Transform tile coord to Literal-Numeric
+    func transformCoord(col: Int, row: Int) -> String {
+        let name = String(UnicodeScalar(UInt8(64 - row + earth.sizeVertical))) + "-" + String(col + 1)
+        return name
     }
 }

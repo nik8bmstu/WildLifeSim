@@ -35,8 +35,8 @@ class GameViewController: UIViewController {
         earth.sizeVertical = countRows
         earth.sizeTile = sizeTile
         earth.initTiles()
-        //scene.prepareMap(earth: earth)
-        //scene.drawFood(earth: earth)
+        // Env init
+        env.foodCount = earth.initFoodCount
         skView.presentScene(scene)
     }
 
