@@ -21,11 +21,17 @@ class GameScene: SKScene {
     let defFontSize: CGFloat = 25
     let defFontColor = SKColor.black
 
-    let upRowY: CGFloat = -329
-    let leftColX: CGFloat = -465
+    let statusY: CGFloat = -415
+    let statusX: CGFloat = -465
 
-    let rightColX: CGFloat = 620
-    let rightColY: CGFloat = 245
+    let tileX: CGFloat = 550
+    let tileY: CGFloat = 330
+    
+    let axisHX: CGFloat = -522
+    let axisHY: CGFloat = 363
+    
+    let axisVX: CGFloat = -542
+    let axisVY: CGFloat = 335
 
     var tapColumn = 0
     var tapRow = 0
@@ -52,11 +58,13 @@ class GameScene: SKScene {
     var topLayer: SKTileMapNode!
     
     // Create labels
+    var axisHLabels: [SKLabelNode] = []
+    var axisVLabels: [SKLabelNode] = []
     var step = SKLabelNode(text: "ШАГ")
     var day = SKLabelNode(text: "День: 0")
     var time = SKLabelNode(text: "Время: 00:00")
     var food = SKLabelNode(text: "Еда: 0")
-    var tileLabel = SKLabelNode(text: "Клетка: 0, 0")
+    var tileLabel = SKLabelNode(text: "Клетка: A1")
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -68,7 +76,7 @@ class GameScene: SKScene {
         //SceneSetting()
         //mapInit()
         //labelInit()
-        self.anchorPoint = CGPoint(x:0.41, y:0.719)
+        self.anchorPoint = CGPoint(x:0.41, y:0.627)
     }
     
     /// First call func
@@ -77,9 +85,6 @@ class GameScene: SKScene {
         SceneSetting()
         mapInit()
         labelInit()
-        //drawEnvParameters(env: env)
-        //drawCurrentTileParam(earth: earth)
-        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -96,6 +101,14 @@ class GameScene: SKScene {
         day.text = "День: \(env.day)"
         time.text = "Время: \(env.hour):00"
         food.text = "Еда: \(env.foodCount)"
+        
+        for i in 0..<earth.sizeHorizontal {
+            envInfo.addChild(axisHLabels[i])
+        }
+        
+        for i in 0..<earth.sizeVertical {
+            envInfo.addChild(axisVLabels[i])
+        }
         
         envInfo.addChild(step)
         envInfo.addChild(day)
@@ -182,36 +195,66 @@ class GameScene: SKScene {
     
     /// Init labels
     func labelInit() {
+        // Horizontal axis labelse
+        for i in 0..<earth.sizeHorizontal {
+            // We must create new label at each iteration
+            let label = SKLabelNode(text: "\(i + 1)")
+            label.fontName = defFontStyle
+            label.fontSize = 15
+            label.fontColor = defFontColor
+            label.name = "axisHLabels[\(i)]"
+            label.position = CGPoint(x: axisHX + 35.95 * CGFloat(i), y: axisHY)
+            label.horizontalAlignmentMode = .center
+            axisHLabels.append(label)
+        }
+        
+        // Vertical axis labelse
+        for i in 0..<earth.sizeVertical {
+            // We must create new label at each iteration
+            let label = SKLabelNode(text: "\(i + 1)")
+            label.fontName = defFontStyle
+            label.fontSize = 15
+            label.fontColor = defFontColor
+            label.name = "axisVLabels[\(i)]"
+            label.position = CGPoint(x: axisVX, y: axisVY - 35.95 * CGFloat(i))
+            label.horizontalAlignmentMode = .right
+            axisVLabels.append(label)
+        }
+        
         step.text = "ШАГ"
         step.fontName = defFontStyle
         step.fontSize = defFontSize
         step.fontColor = SKColor.white
         step.name = "step"
-        step.position = CGPoint(x: leftColX, y: upRowY)
+        step.position = CGPoint(x: statusX, y: statusY)
         
         day.fontName = defFontStyle
         day.fontSize = defFontSize
-        day.fontColor = SKColor.red
+        day.fontColor = defFontColor
         day.name = "day"
-        day.position = CGPoint(x: leftColX + 130, y: upRowY)
+        day.position = CGPoint(x: statusX + 100, y: statusY)
+        day.horizontalAlignmentMode = .left
         
         time.fontName = defFontStyle
         time.fontSize = defFontSize
-        time.fontColor = SKColor.red
+        time.fontColor = defFontColor
         time.name = "time"
-        time.position = CGPoint(x: leftColX + 285, y: upRowY)
+        time.position = CGPoint(x: statusX + 230, y: statusY)
+        time.horizontalAlignmentMode = .left
         
         food.fontName = defFontStyle
         food.fontSize = defFontSize
         food.fontColor = defFontColor
         food.name = "food"
-        food.position = CGPoint(x: leftColX + 430, y: upRowY)
+        food.position = CGPoint(x: statusX + 430, y: statusY)
+        food.horizontalAlignmentMode = .left
         
         tileLabel.fontName = defFontStyle
         tileLabel.fontSize = defFontSize
         tileLabel.fontColor = defFontColor
         tileLabel.name = "tileLabel"
-        tileLabel.position = CGPoint(x: rightColX, y: rightColY)
+        tileLabel.position = CGPoint(x: tileX, y: tileY)
+        tileLabel.horizontalAlignmentMode = .left
     }
     
     /// Settings
@@ -232,16 +275,9 @@ class GameScene: SKScene {
         tileInfo.yScale = 1
         // Create Step button
         button = SKSpriteNode(color: SKColor.red, size: CGSize(width: 150, height: 50))
-        button.position = CGPoint(x: leftColX, y:upRowY + 9)
+        button.position = CGPoint(x: statusX, y:statusY + 9)
         addChild(button)
     }
-    /*
-    /// Prepare map
-    func prepareMap(earth: Ground) {
-        let newLayer = SKTileMapNode(tileSet: tileSet, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
-        newLayer.fill(with: backgroundTiles)
-        map.addChild(newLayer)
-    }*/
     
     /// Step button tap function
     func stepButtonTapped() {
@@ -261,10 +297,11 @@ class GameScene: SKScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first
         let touchLocation = touch!.location(in: self)
-            // Check location of the touch
-            if button.contains(touchLocation) {
-                stepButtonTapped()
-            }
+        print(touchLocation)
+        // Check location of the touch
+        if button.contains(touchLocation) {
+            stepButtonTapped()
+        }
         if map.contains(touchLocation) {
             mapTapped(point: touchLocation)
         }

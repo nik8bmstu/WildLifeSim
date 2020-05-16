@@ -12,7 +12,7 @@ import GameplayKit
 
 // Ground class code
 let countColumns = 30
-let countRows = 15
+let countRows = 20
 let sizeTile = 90
 let earth = Ground()
 let env = Environment()
