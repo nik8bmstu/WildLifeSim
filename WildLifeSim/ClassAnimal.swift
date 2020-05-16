@@ -46,6 +46,9 @@ struct Coord {
     var row: Int
 }
 
+let maleNames: [String] = ["Ричард", "Сэм", "Томас", "Чак"]
+let femaleNames: [String] = ["София", "Дейзи", "Кара", "Дора"]
+
 class Animal {
     var id: Int = 1
     var name: String
@@ -54,10 +57,16 @@ class Animal {
     var age: Int = 0
     var coord: Coord
     var direction: Direction = .down
+    var isFemale: Bool
     
-    init(myName: String, myCoord: Coord) {
+    init(myCoord: Coord) {
+        isFemale = Bool.random()
         coord = myCoord
-        name = myName
+        if isFemale {
+            name = femaleNames[Int.random(in: 0..<femaleNames.count)]
+        } else {
+            name = maleNames[Int.random(in: 0..<maleNames.count)]
+        }
     }
     
     func placeOnGround(earth: Ground) {

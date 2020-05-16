@@ -35,10 +35,10 @@ class Environment {
     
     /// Init start animal pool
     func animalsInit() {
-        // Place 3 animal
-        for i in 0...2 {
+        // Place animals
+        for i in 0...3 {
             let coord = animalCoordRandomize()
-            var newAnimal = Animal(myName: "Корова " + "\(i + 1)", myCoord: coord)
+            var newAnimal = Animal(myCoord: coord)
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
             newAnimal.id = i + 1
@@ -66,6 +66,11 @@ class Environment {
     
     /// Return animal index by coord
     func getAnimalIndex(coord: Coord) -> Int {
+        for i in 0..<animalCount {
+            if animals[i].coord.col == coord.col && animals[i].coord.row == coord.row {
+                return i
+            }
+        }
         return 0
     }
     
