@@ -36,13 +36,47 @@ class Environment {
     /// Init start animal pool
     func animalsInit() {
         // Place animals
-        for i in 0...3 {
+        for i in 0...1 {
             let coord = animalCoordRandomize()
             var newAnimal = Animal(myCoord: coord)
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
             newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            newAnimal.direction = .down
+            animalCount += 1
+            animals.append(newAnimal)
+        }
+        for i in 0...1 {
+            let coord = animalCoordRandomize()
+            var newAnimal = Animal(myCoord: coord)
+            newAnimal.placeOnGround(earth: earth)
+            newAnimal.sizeType = .medium
+            newAnimal.id = animalCount
+            newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            newAnimal.direction = .up
+            animalCount += 1
+            animals.append(newAnimal)
+        }
+        for i in 0...1 {
+            let coord = animalCoordRandomize()
+            var newAnimal = Animal(myCoord: coord)
+            newAnimal.placeOnGround(earth: earth)
+            newAnimal.sizeType = .medium
+            newAnimal.id = animalCount
+            newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            newAnimal.direction = .left
+            animalCount += 1
+            animals.append(newAnimal)
+        }
+        for i in 0...1 {
+            let coord = animalCoordRandomize()
+            var newAnimal = Animal(myCoord: coord)
+            newAnimal.placeOnGround(earth: earth)
+            newAnimal.sizeType = .medium
+            newAnimal.id = animalCount
+            newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            newAnimal.direction = .right
             animalCount += 1
             animals.append(newAnimal)
         }

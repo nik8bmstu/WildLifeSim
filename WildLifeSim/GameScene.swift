@@ -56,7 +56,12 @@ class GameScene: SKScene {
     
     // Connect Animal Tile set
     var animalTileSet = SKTileSet(named: "animals")
-    var cowDown: SKTileGroup!
+    var animalTileGroup: SKTileGroup!
+    // Cows
+    //var cowDown: SKTileGroup!
+    //var cowUp: SKTileGroup!
+    //var cowLeft: SKTileGroup!
+    //var cowRight: SKTileGroup!
     
     // Animal layer
     var animalLayer: SKTileMapNode!
@@ -170,7 +175,9 @@ class GameScene: SKScene {
         // Place all animals
         for i in 0..<env.animalCount {
             let coord = env.animals[i].coord
-            animalLayer.setTileGroup(cowDown, forColumn: coord.col, row: coord.row)
+            let tileName = env.animals[i].type.rawValue + env.animals[i].direction.rawValue
+            animalTileGroup = animalTileSet!.tileGroups.first {$0.name == tileName}
+            animalLayer.setTileGroup(animalTileGroup, forColumn: coord.col, row: coord.row)
         }
         animalsMap.addChild(animalLayer)
     }
@@ -244,7 +251,7 @@ class GameScene: SKScene {
     /// Animals init
     func animalsInit() {
         // Connect tiles
-        cowDown = animalTileSet!.tileGroups.first {$0.name == "cowdown"}!
+        //cowDown = animalTileSet!.tileGroups.first {$0.name == "cowdown"}!
         // Create layer
         animalLayer = SKTileMapNode(tileSet: animalTileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         animalLayer.name = "animalLayer"
