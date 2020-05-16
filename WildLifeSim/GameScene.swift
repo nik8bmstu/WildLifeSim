@@ -32,7 +32,8 @@ class GameScene: SKScene {
     
     // Connect Ground Tile set
     var tileSet = SKTileSet(named: "groundsSet")
-    var tileSize: CGSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
+    //var tileSize: CGSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
+    var tileSize: CGSize = CGSize(width: 90, height: 90)
     var backgroundTiles: SKTileGroup!
     var grassTiles: SKTileGroup!
     var forestTiles: SKTileGroup!
@@ -64,18 +65,18 @@ class GameScene: SKScene {
     override init(size: CGSize) {
         super.init(size: size)
         
-        SceneSetting()
-        mapInit()
-        labelInit()
+        //SceneSetting()
+        //mapInit()
+        //labelInit()
         self.anchorPoint = CGPoint(x:0.41, y:0.719)
     }
     
     /// First call func
     override func didMove(to view: SKView)
     {
-        //SceneSetting()
-        //mapInit()
-        //labelInit()
+        SceneSetting()
+        mapInit()
+        labelInit()
         //drawEnvParameters(env: env)
         //drawCurrentTileParam(earth: earth)
         
