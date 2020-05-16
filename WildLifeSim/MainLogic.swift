@@ -17,6 +17,7 @@ class Environment {
     var herbivorousCount: Int = 0
     var predatorCount: Int = 0
     var currentAnimal: Int = 0
+    var animals: [Animal] = []
     
     // Logic step
     func hourStep(map: Ground) {
@@ -30,6 +31,37 @@ class Environment {
         
         isDayTime = ((7 < hour) && (hour < 20)) ? true : false
         
+    }
+    
+    /// Init start animal pool
+    func animalsInit() {
+        // Place 3 animal
+        for i in 0...2 {
+            let coord = animalCoordRandomize()
+            var newAnimal = Animal(myName: "Корова" + "\(i + 1)", myCoord: coord)
+            newAnimal.placeOnGround(earth: earth)
+            newAnimal.sizeType = .medium
+            newAnimal.id = i + 1
+            newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            animalCount += 1
+            animals.append(newAnimal)
+        }
+        currentAnimal = animals.endIndex
+    }
+    
+    /// Find empty location for animal
+    func animalCoordRandomize() -> Coord {
+        var isOk = false
+        var perfectCoord = Coord(col: 0, row: 0)
+        while !isOk {
+            let col = Int.random(in: 0...earth.sizeHorizontal)
+            let row = Int.random(in: 0...earth.sizeVertical)
+            if (earth.tiles[col][row].isEmpty && earth.tiles[col][row].isAcessable)  {
+                isOk = true
+                perfectCoord = Coord(col: col, row: row)
+            }
+        }
+        return perfectCoord
     }
     
     /// Calc food count

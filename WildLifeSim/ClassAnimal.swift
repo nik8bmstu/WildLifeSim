@@ -8,6 +8,9 @@
 
 import Foundation
 
+let mediumSizeMin = 50
+let mediumSizeMax = 75
+
 enum SizeType {
     case small
     case medium

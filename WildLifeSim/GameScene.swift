@@ -75,6 +75,8 @@ class GameScene: SKScene {
     var tileEmpty = SKLabelNode(text: "Свободна")
     // Animal
     var animalLabel = SKLabelNode(text: "Животное:")
+    var animalName = SKLabelNode(text: "Имя")
+    var animalSize = SKLabelNode(text: "Среднее(50)")
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

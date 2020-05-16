@@ -37,10 +37,8 @@ class GameViewController: UIViewController {
         earth.initTiles()
         // Env init
         env.foodCount = earth.initFoodCount
-        // Animals init
-        let coord = Coord(col: 0, row: 0)
-        var wolf = Animal(myName: "Волк 1", myCoord: coord)
-        wolf.placeOnGround(earth: earth)
+        env.animalsInit()
+        
         // Enable scene
         skView.presentScene(scene)
     }
