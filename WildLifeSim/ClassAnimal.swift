@@ -11,10 +11,18 @@ import Foundation
 let mediumSizeMin = 50
 let mediumSizeMax = 75
 
-enum SizeType {
+enum SizeType: String {
     case small
     case medium
     case big
+    
+    var rawValue: String {
+        switch self {
+            case .small: return "Маленькое "
+            case .medium: return "Среднее "
+            case .big: return "Большое "
+        }
+    }
 }
 
 struct Coord {

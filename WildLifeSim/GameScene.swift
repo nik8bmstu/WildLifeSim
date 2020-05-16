@@ -104,7 +104,7 @@ class GameScene: SKScene {
         drawFood(earth: earth)
         drawEnvParameters(env: env)
         drawCurrentTileParam(earth: earth)
-        drawCurrentObjectParam(earth: earth)
+        drawCurrentObjectParam(earth: earth, env: env)
     }
     
     /// Draw environment parameters
@@ -155,12 +155,18 @@ class GameScene: SKScene {
     }
     
     /// Draw current object param
-    func drawCurrentObjectParam(earth: Ground) {
+    func drawCurrentObjectParam(earth: Ground, env: Environment) {
         objInfo.removeAllChildren()
         let curTile = earth.tiles[tapColumn][tapRow]
         if !curTile.isEmpty {
             if curTile.meatCount == 0 {
+                let coord = Coord(col: tapColumn, row: tapRow)
+                let index = env.getAnimalIndex(coord: coord)
+                animalName.text = env.animals[index].name
+                animalSize.text = env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
                 objInfo.addChild(animalLabel)
+                objInfo.addChild(animalName)
+                objInfo.addChild(animalSize)
             } else {
                 
             }
@@ -343,6 +349,22 @@ class GameScene: SKScene {
         animalLabel.name = "animalLabel"
         animalLabel.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 6)
         animalLabel.horizontalAlignmentMode = .left
+        
+        // Animal name
+        animalName.fontName = defFontStyle
+        animalName.fontSize = defFontSize - 5
+        animalName.fontColor = defFontColor
+        animalName.name = "animalName"
+        animalName.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 7)
+        animalName.horizontalAlignmentMode = .left
+        
+        // Animal size
+        animalSize.fontName = defFontStyle
+        animalSize.fontSize = defFontSize - 5
+        animalSize.fontColor = defFontColor
+        animalSize.name = "animalSize"
+        animalSize.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 8)
+        animalSize.horizontalAlignmentMode = .left
     }
     
     /// Settings
