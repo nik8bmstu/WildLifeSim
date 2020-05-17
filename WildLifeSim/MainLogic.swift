@@ -50,6 +50,7 @@ class Environment {
             newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
             newAnimal.direction = .down
+            newAnimal.type = .cow
             animalCount += 1
             animals.append(newAnimal)
         }
@@ -61,6 +62,7 @@ class Environment {
             newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
             newAnimal.direction = .up
+            newAnimal.type = .cow
             animalCount += 1
             animals.append(newAnimal)
         }
@@ -72,6 +74,7 @@ class Environment {
             newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
             newAnimal.direction = .left
+            newAnimal.type = .sheep
             animalCount += 1
             animals.append(newAnimal)
         }
@@ -83,6 +86,7 @@ class Environment {
             newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
             newAnimal.direction = .right
+            newAnimal.type = .sheep
             animalCount += 1
             animals.append(newAnimal)
         }

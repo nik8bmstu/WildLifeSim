@@ -8,22 +8,43 @@
 
 import Foundation
 
+let smallSizeMin = 10
+let smallSizeMax = 20
+
 let mediumSizeMin = 50
-let mediumSizeMax = 75
+let mediumSizeMax = 70
+
+let largeSizeMin = 100
+let largeSizeMax = 130
 
 enum Type: String {
     case cow = "cow"
     case horse = "horse"
     case elephant = "elephant"
+    case sheep = "sheep"
     
-    var label: String {
+    var labelF: String {
         switch self {
         case .cow:
             return "Корова "
         case .horse:
             return "Лошадь "
         case .elephant:
+            return "Слониха "
+        case .sheep:
+            return "Овца "
+        }
+    }
+    var labelM: String {
+        switch self {
+        case .cow:
+            return "Бык "
+        case .horse:
+            return "Конь "
+        case .elephant:
             return "Слон "
+        case .sheep:
+            return "Баран "
         }
     }
 }
@@ -31,7 +52,7 @@ enum Type: String {
 enum SizeType: String {
     case small = "S"
     case medium = "M"
-    case big = "B"
+    case large = "L"
 }
 
 enum Direction: String {
