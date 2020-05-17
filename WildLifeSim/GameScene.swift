@@ -24,6 +24,11 @@ class GameScene: SKScene {
     let defFontStyle = "American Typewriter"
     let defFontSize: CGFloat = 25
     let defFontColor = SKColor.black
+    let fontTypeAttribute = [ NSAttributedString.Key.font: UIFont.init(name: "American Typewriter", size: 25)]
+    //let fontSizeAttribute = [ NSAttributedString.Key.kern: "American Typewriter"]
+    let blackAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.black ]
+    let greenAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.green ]
+    let redAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.red ]
 
     let statusY: CGFloat = -415
     let statusX: CGFloat = -465
@@ -84,7 +89,9 @@ class GameScene: SKScene {
     var step = SKLabelNode(text: "ШАГ")
     var day = SKLabelNode(text: "День: 0")
     var time = SKLabelNode(text: "Время: 00:00")
-    var food = SKLabelNode(text: "Еда: 0")
+    var food = SKLabelNode(text: "Еды: 0")
+    var animals = SKLabelNode(text: "Животных: 1 + 2 = 3")
+
     // Tile
     var tileLabel = SKLabelNode(text: "Клетка: A1")
     var tileType = SKLabelNode(text: "Поверхность")
@@ -134,7 +141,21 @@ class GameScene: SKScene {
         
         day.text = "День: \(env.day)"
         time.text = "Время: \(env.hour):00"
-        food.text = "Еда: \(env.foodCount)"
+        food.text = "Еды: \(env.foodCount)"
+        // create attributed animals count string
+        let herbivorousCount = "\(env.herbivorousCount)"
+        let predatorCount = "\(env.predatorCount)"
+        let animalsCount = "Животных: \(herbivorousCount) | \(predatorCount)  (\(env.animalCount))"
+        let fullRange = NSRange(location: 0, length: animalsCount.count)
+        let herbivorousRange = NSRange(location: 10, length: herbivorousCount.count)
+        let predatorRange = NSRange(location: 13 + herbivorousCount.count, length: predatorCount.count)
+        let fullCount = NSMutableAttributedString(string: animalsCount, attributes: fontTypeAttribute as [NSAttributedString.Key : Any])
+        fullCount.addAttributes(blackAttribute, range: fullRange)
+        fullCount.addAttributes(greenAttribute, range: herbivorousRange)
+        fullCount.addAttributes(redAttribute, range: predatorRange)
+        animals.attributedText = fullCount
+        //herbivorous.text = "\(env.herbivorousCount)"
+        //predator.text = "\(env.predatorCount)"
         
         for i in 0..<earth.sizeHorizontal {
             envInfo.addChild(axisHLabels[i])
@@ -148,6 +169,7 @@ class GameScene: SKScene {
         envInfo.addChild(day)
         envInfo.addChild(time)
         envInfo.addChild(food)
+        envInfo.addChild(animals)
     }
     
     /// Draw current taped tile parameters
@@ -371,6 +393,14 @@ class GameScene: SKScene {
         food.name = "food"
         food.position = CGPoint(x: statusX + 430, y: statusY)
         food.horizontalAlignmentMode = .left
+        
+        // Animals count
+        animals.fontName = defFontStyle
+        animals.fontSize = defFontSize
+        animals.fontColor = defFontColor
+        animals.name = "animals"
+        animals.position = CGPoint(x: statusX + 570, y: statusY)
+        animals.horizontalAlignmentMode = .left
         
         // Tile coord
         tileLabel.fontName = defFontStyle

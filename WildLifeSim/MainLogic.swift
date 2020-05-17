@@ -52,6 +52,8 @@ class Environment {
             newAnimal.direction = .down
             newAnimal.type = .cow
             animalCount += 1
+            herbivorousCount += 1
+            // predatorCount += 1
             animals.append(newAnimal)
         }
         for i in 0...1 {
@@ -64,6 +66,8 @@ class Environment {
             newAnimal.direction = .up
             newAnimal.type = .cow
             animalCount += 1
+            herbivorousCount += 1
+            // predatorCount += 1
             animals.append(newAnimal)
         }
         for i in 0...1 {
@@ -76,6 +80,8 @@ class Environment {
             newAnimal.direction = .left
             newAnimal.type = .sheep
             animalCount += 1
+            herbivorousCount += 1
+            // predatorCount += 1
             animals.append(newAnimal)
         }
         for i in 0...1 {
@@ -88,6 +94,8 @@ class Environment {
             newAnimal.direction = .right
             newAnimal.type = .sheep
             animalCount += 1
+            //herbivorousCount += 1
+            predatorCount += 1
             animals.append(newAnimal)
         }
         currentAnimal = animals.endIndex
