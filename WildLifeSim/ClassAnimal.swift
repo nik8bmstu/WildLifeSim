@@ -23,10 +23,6 @@ let largeSizeMax = 150
 let largeSizeInitMin = 110
 let largeSizeInitMax = 130
 
-
-let initFoodInterest = 10
-let initWaterInterest = 5
-
 enum Type: String {
     case cow = "cow"
     case horse = "horse"
@@ -84,7 +80,7 @@ enum SizeType: String {
         case .small:
             return 10
         case .medium:
-            return 7
+            return 20
         case .large:
             return 30
         }
@@ -119,6 +115,7 @@ enum visObjType: String {
     case water = "Выпить воды"
     case sleep = "Поспать"
     case look = "Осмотреться"
+    case forward = "Идти дальше"
 }
 
 struct visibleObject {
@@ -148,6 +145,7 @@ class Animal {
     var direction: Direction = .down
     // Пол
     var isFemale: Bool
+    var isPregnant: Bool = false
     // Очки действий
     var actionPoints: Int = 6
     // Поле видимости
@@ -223,7 +221,7 @@ class Animal {
     // Global actions (look, think, act)
     
     /// Look
-    func look(map: Ground) {
+    func look(map: Ground, neighbors: Environment) {
         legend.append("\"\(name)\" осматривается ")
         // Delete old objects excepting sleep and look
         if visibleObjects.count > 2 {
@@ -233,7 +231,7 @@ class Animal {
             }
         }
         // Find new objects
-        findObjects(map: map)
+        findObjects(map: map, neighbors: neighbors)
         legend.append("и находит следующие возможности:\n")
         // Print new object list
         for i in 0..<visibleObjects.count {
@@ -275,18 +273,39 @@ class Animal {
     // Stuff functions
     
     /// Find objects
-    func findObjects(map: Ground) {
+    func findObjects(map: Ground, neighbors: Environment) {
         defineVisibleTiles(map: map)
         for i in 1..<visibleTiles.count {
             let currentCoord = Coord(col: visibleTiles[i].col, row: visibleTiles[i].row)
             let tile = map.tiles[currentCoord.col][currentCoord.row]
             if (tile.foodCount > 0) && !isPredator {
-                let object = visibleObject(tile: currentCoord, interestLevel: initFoodInterest * tile.foodCount, type: .food)
+                let object = visibleObject(tile: currentCoord, interestLevel: tile.foodCount, type: .food)
                 visibleObjects.append(object)
             }
             if tile.waterHere {
-                let object = visibleObject(tile: currentCoord, interestLevel: initWaterInterest, type: .water)
+                let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .water)
                 visibleObjects.append(object)
+            }
+            if !tile.isEmpty {
+                let index = neighbors.getAnimalIndex(coord: currentCoord)
+                // If it alive
+                if neighbors.animals[index].isAlive {
+                    // I i am not a predator
+                    if !isPredator {
+                        // If it is a predator and bigger than me
+                        if (neighbors.animals[index].isPredator && neighbors.animals[index].size > size) {
+                            let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .danger)
+                            visibleObjects.append(object)
+                        } else if ((neighbors.animals[index].isFemale != isFemale) && (neighbors.animals[index].type == type)) {
+                            // Same type, but another gender
+                            if (!neighbors.animals[index].isPregnant && !isPregnant) {
+                                // No one is pregnant
+                                let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .partner)
+                                visibleObjects.append(object)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

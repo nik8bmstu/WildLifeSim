@@ -37,7 +37,7 @@ class Environment {
             default:
                 animals[i].rotateRight()
             }
-            animals[i].look(map: earth)
+            animals[i].look(map: earth, neighbors: self)
             
             if hour == 0 {
                 animals[i].birthday()
