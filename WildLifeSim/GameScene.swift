@@ -93,6 +93,7 @@ class GameScene: SKScene {
     var time = SKLabelNode(text: "Время: 00:00")
     var food = SKLabelNode(text: "Еды: 0")
     var animals = SKLabelNode(text: "Животных: 1 + 2 = 3")
+    var legend = SKLabelNode(text: "Legend")
 
     // Tile
     var tileLabel = SKLabelNode(text: "Клетка: A1")
@@ -229,6 +230,9 @@ class GameScene: SKScene {
                 objInfo.addChild(animalLabel)
                 objInfo.addChild(animalName)
                 objInfo.addChild(animalSize)
+                
+                legend.text = env.animals[index].legend
+                envInfo.addChild(legend)
             } else {
                 
             }
@@ -407,6 +411,14 @@ class GameScene: SKScene {
         animals.name = "animals"
         animals.position = CGPoint(x: statusX + 570, y: statusY)
         animals.horizontalAlignmentMode = .left
+        
+        // Animal's legend
+        legend.fontName = defFontStyle
+        legend.fontSize = defFontSize - 5
+        legend.fontColor = SKColor.darkGray
+        legend.name = "legend"
+        legend.position = CGPoint(x: statusX - 75, y: statusY - 50)
+        legend.horizontalAlignmentMode = .left
         
         // Tile coord
         tileLabel.fontName = defFontStyle

@@ -34,6 +34,7 @@ enum Type: String {
     case sheep = "sheep"
     case goat = "goat"
     case tiger = "tiger"
+    case chicken = "chicken"
     
     var labelF: String {
         switch self {
@@ -49,6 +50,8 @@ enum Type: String {
             return "Коза"
         case .tiger:
             return "Тигрица"
+        case .chicken:
+            return "Курица"
         }
     }
     var labelM: String {
@@ -65,6 +68,8 @@ enum Type: String {
             return "Козел"
         case .tiger:
             return "Тигр"
+        case .chicken:
+            return "Петух"
         }
     }
 }
@@ -142,7 +147,8 @@ class Animal {
     var targetObject: visibleObject
     // Видимые клетки
     var visibleTiles: [Coord] = []
-    
+    // legend
+    var legend: String = ""
     
     /// Init
     init(myCoord: Coord, myType: Type) {
@@ -155,17 +161,46 @@ class Animal {
         default:
             isPredator = true
         }
+        // Get size
+        switch type {
+        case .chicken:
+            sizeType = .small
+            size = Int.random(in: smallSizeInitMin...smallSizeInitMax)
+        case .elephant:
+            sizeType = .large
+            size = Int.random(in: largeSizeInitMin...largeSizeInitMax)
+        default:
+            sizeType = .medium
+            size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
+        }
+        // Chose gender
         isFemale = Bool.random()
+        // Get coord
         coord = myCoord
+        // Chose name
         if isFemale {
             name = femaleNames[Int.random(in: 0..<femaleNames.count)]
         } else {
             name = maleNames[Int.random(in: 0..<maleNames.count)]
         }
+        // Chose direction
+        let dir = Int.random(in: 0...3)
+        switch dir {
+        case 0:
+            direction = .down
+        case 1:
+            direction = .up
+        case 2:
+            direction = .left
+        default:
+            direction = .right
+        }
+        // define target and visible tiles
         targetObject = visibleObject(tile: myCoord, interestLevel: 0, type: .sleep)
         visibleObjects.append(targetObject)
         visibleObjects.append(visibleObject(tile: myCoord, interestLevel: 0, type: .look))
         visibleTiles.append(myCoord)
+        legend = sayHello()
     }
     
     func placeOnGround(earth: Ground) {
@@ -341,7 +376,7 @@ class Animal {
     /// Say hello
     func sayHello() -> String {
         let typeLabel = isFemale ? type.labelF : type.labelM
-        let helloString = "Меня зовут \"\(name)\", я - \(typeLabel), мой возраст \(age), мой вес \(size)"
+        let helloString = "Меня зовут \"\(name)\", я - \(typeLabel), мой возраст \(age), мой вес \(size)\n"
         return helloString
     }
 }

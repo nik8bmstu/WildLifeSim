@@ -16,7 +16,6 @@ class Environment {
     var animalCount: Int = 0
     var herbivorousCount: Int = 0
     var predatorCount: Int = 0
-    var currentAnimal: Int = 0
     var animals: [Animal] = []
     
     // Logic step
@@ -49,9 +48,6 @@ class Environment {
             let coord = animalCoordRandomize()
             var newAnimal = Animal(myCoord: coord, myType: .horse)
             newAnimal.placeOnGround(earth: earth)
-            newAnimal.sizeType = .medium
-            newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
-            newAnimal.direction = .down
             newAnimal.visibilityAround = 2
             newAnimal.visibilityForward = 5
             newAnimal.defineVisibleTiles(map: earth)
@@ -61,9 +57,6 @@ class Environment {
             let coord = animalCoordRandomize()
             var newAnimal = Animal(myCoord: coord, myType: .cow)
             newAnimal.placeOnGround(earth: earth)
-            newAnimal.sizeType = .medium
-            newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
-            newAnimal.direction = .up
             newAnimal.visibilityAround = 1
             newAnimal.visibilityForward = 4
             newAnimal.defineVisibleTiles(map: earth)
@@ -73,9 +66,6 @@ class Environment {
             let coord = animalCoordRandomize()
             var newAnimal = Animal(myCoord: coord, myType: .sheep)
             newAnimal.placeOnGround(earth: earth)
-            newAnimal.sizeType = .medium
-            newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
-            newAnimal.direction = .left
             newAnimal.visibilityAround = 1
             newAnimal.visibilityForward = 3
             newAnimal.defineVisibleTiles(map: earth)
@@ -85,16 +75,13 @@ class Environment {
             let coord = animalCoordRandomize()
             var newAnimal = Animal(myCoord: coord, myType: .goat)
             newAnimal.placeOnGround(earth: earth)
-            newAnimal.sizeType = .medium
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
-            newAnimal.direction = .right
             newAnimal.visibilityAround = 2
             newAnimal.visibilityForward = 1
             newAnimal.defineVisibleTiles(map: earth)
             animals.append(newAnimal)
         }
         animalCount = animals.count
-        currentAnimal = animals.endIndex
     }
     
     /// Find empty location for animal
