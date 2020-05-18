@@ -8,14 +8,20 @@
 
 import Foundation
 
-let smallSizeMin = 10
-let smallSizeMax = 20
+let smallSizeMin = 1
+let smallSizeMax = 25
+let smallSizeInitMin = 10
+let smallSizeInitMax = 20
 
 let mediumSizeMin = 50
-let mediumSizeMax = 70
+let mediumSizeMax = 90
+let mediumSizeInitMin = 65
+let mediumSizeInitMax = 80
 
-let largeSizeMin = 100
-let largeSizeMax = 130
+let largeSizeMin = 90
+let largeSizeMax = 150
+let largeSizeInitMin = 110
+let largeSizeInitMax = 130
 
 enum Type: String {
     case cow = "cow"
@@ -82,7 +88,7 @@ let femaleNames: [String] = ["София", "Дейзи", "Кара", "Дора",
 class Animal {
     var id: Int = 1
     var name: String
-    var size: Int = 50
+    var size: Int = mediumSizeInitMax
     var sizeType: SizeType = .medium
     var type: Type = .cow
     var age: Int = 0

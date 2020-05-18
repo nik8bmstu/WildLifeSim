@@ -48,9 +48,9 @@ class Environment {
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
             newAnimal.id = animalCount
-            newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .down
-            newAnimal.type = .cow
+            newAnimal.type = .horse
             animalCount += 1
             herbivorousCount += 1
             // predatorCount += 1
@@ -62,7 +62,7 @@ class Environment {
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
             newAnimal.id = animalCount
-            newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .up
             newAnimal.type = .cow
             animalCount += 1
@@ -76,7 +76,7 @@ class Environment {
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
             newAnimal.id = animalCount
-            newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .left
             newAnimal.type = .sheep
             animalCount += 1
@@ -90,7 +90,7 @@ class Environment {
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
             newAnimal.id = animalCount
-            newAnimal.size = Int.random(in: mediumSizeMin...mediumSizeMax)
+            newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .right
             newAnimal.type = .sheep
             animalCount += 1
