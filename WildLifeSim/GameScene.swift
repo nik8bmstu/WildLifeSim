@@ -158,8 +158,6 @@ class GameScene: SKScene {
         fullCount.addAttributes(greenAttribute, range: herbivorousRange)
         fullCount.addAttributes(redAttribute, range: predatorRange)
         animals.attributedText = fullCount
-        //herbivorous.text = "\(env.herbivorousCount)"
-        //predator.text = "\(env.predatorCount)"
         
         for i in 0..<earth.sizeHorizontal {
             envInfo.addChild(axisHLabels[i])
@@ -415,7 +413,7 @@ class GameScene: SKScene {
         
         // Animal's legend
         legend.fontName = defFontStyle
-        legend.fontSize = defFontSize - 5
+        legend.fontSize = defFontSize - 7
         legend.fontColor = SKColor.darkGray
         legend.name = "legend"
         legend.position = CGPoint(x: statusX - 75, y: statusY - 50)
@@ -544,7 +542,7 @@ class GameScene: SKScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first
         let touchLocation = touch!.location(in: self)
-        print(touchLocation)
+        //print(touchLocation)
         // Check location of the touch
         if button.contains(touchLocation) {
             stepButtonTapped()

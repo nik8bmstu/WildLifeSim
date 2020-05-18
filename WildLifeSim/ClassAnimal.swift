@@ -78,6 +78,17 @@ enum SizeType: String {
     case small = "S"
     case medium = "M"
     case large = "L"
+    
+    var lifeTime: Int {
+        switch self {
+        case .small:
+            return 10
+        case .medium:
+            return 7
+        case .large:
+            return 30
+        }
+    }
 }
 
 enum Direction: Int {
@@ -131,6 +142,7 @@ class Animal {
     var isPredator: Bool = false
     // Возраст
     var age: Int = 0
+    var isAlive: Bool = true
     // Параметры расположения
     var coord: Coord
     var direction: Direction = .down
@@ -212,7 +224,7 @@ class Animal {
     
     /// Look
     func look(map: Ground) {
-        legend.append("\"\(name)\" осматривается...\n")
+        legend.append("\"\(name)\" осматривается ")
         // Delete old objects excepting sleep and look
         if visibleObjects.count > 2 {
             let count = visibleObjects.count
@@ -222,10 +234,10 @@ class Animal {
         }
         // Find new objects
         findObjects(map: map)
-        legend.append("\"\(name)\" находит следующие возможности:\n")
+        legend.append("и находит следующие возможности:\n")
         // Print new object list
         for i in 0..<visibleObjects.count {
-            legend.append("\(visibleObjects[i].type.rawValue) на клетке \(transformCoord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row))\n")
+            legend.append("- \(visibleObjects[i].type.rawValue) на клетке \(transformCoord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row))\n")
         }
     }
     
@@ -286,14 +298,14 @@ class Animal {
         visibleTiles.append(coord)
         defineVisibleTilesAround(map: map)
         defineVisibleTilesForward(map: map)
-        var visibleTilesString = "\"\(name)\" видит следующие клетки: "
+        /*var visibleTilesString = "\"\(name)\" видит следующие клетки: "
         visibleTilesString.append("\(transformCoord(col: visibleTiles[0].col, row: visibleTiles[0].row))")
         if visibleTiles.count > 1 {
             for i in 1..<visibleTiles.count {
                 visibleTilesString.append(", \(transformCoord(col: visibleTiles[i].col, row: visibleTiles[i].row))")
             }
         }
-        print(visibleTilesString)
+        print(visibleTilesString)*/
     }
     
     /// Define visible tiles around
@@ -376,5 +388,21 @@ class Animal {
         let typeLabel = isFemale ? type.labelF : type.labelM
         let helloString = "Меня зовут \"\(name)\", я - \(typeLabel), мой возраст \(age), мой вес \(size)\n"
         return helloString
+    }
+    
+    /// Birthday
+    func birthday() {
+        age += 1
+        let chanceDie = Int.random(in: 0...age)
+        print("\(name) - chance of die \(chanceDie) / \(sizeType.lifeTime)")
+        if chanceDie > sizeType.lifeTime {
+            die()
+        }
+    }
+    
+    /// Die
+    func die() {
+        isAlive = false
+        print("DIED")
     }
 }

@@ -28,6 +28,7 @@ class Environment {
         }
         isDayTime = ((7 < hour) && (hour < 20)) ? true : false
         animals.shuffle()
+        var deadAnimals: Int = 0
         for i in 0..<animalCount {
             animals[i].legend = ""
             switch Int.random(in: 0...1) {
@@ -37,7 +38,25 @@ class Environment {
                 animals[i].rotateRight()
             }
             animals[i].look(map: earth)
+            
+            if hour == 0 {
+                animals[i].birthday()
+                if !animals[i].isAlive {
+                    deadAnimals += 1
+                }
+            }
         }
+        while deadAnimals > 0 {
+            for i in 0..<animals.count {
+                if !animals[i].isAlive {
+                    map.tiles[animals[i].coord.col][animals[i].coord.row].meatCount = animals[i].size / 10
+                    animals.remove(at: i)
+                    deadAnimals -= 1
+                    break
+                }
+            }
+        }
+        animalCount = animals.count
     }
     
     /// Init start animal pool
