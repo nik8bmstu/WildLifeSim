@@ -32,6 +32,8 @@ enum Type: String {
     case horse = "horse"
     case elephant = "elephant"
     case sheep = "sheep"
+    case goat = "goat"
+    case tiger = "tiger"
     
     var labelF: String {
         switch self {
@@ -43,6 +45,10 @@ enum Type: String {
             return "Слониха"
         case .sheep:
             return "Овца"
+        case .goat:
+            return "Коза"
+        case .tiger:
+            return "Тигрица"
         }
     }
     var labelM: String {
@@ -55,6 +61,10 @@ enum Type: String {
             return "Слон"
         case .sheep:
             return "Баран"
+        case .goat:
+            return "Козел"
+        case .tiger:
+            return "Тигр"
         }
     }
 }
@@ -65,13 +75,13 @@ enum SizeType: String {
     case large = "L"
 }
 
-enum Direction: String {
-    case down
-    case up
-    case left
-    case right
+enum Direction: Int {
+    case down = 0
+    case up = 1
+    case left = 2
+    case right = 3
     
-    var rawValue: String {
+    var label: String {
         switch self {
         case .down: return "down"
         case .up: return "up"
@@ -106,8 +116,6 @@ let maleNames: [String] = ["Ричард", "Сэм", "Томас", "Чак", "Г
 let femaleNames: [String] = ["София", "Дейзи", "Кара", "Дора", "Бонни", "Сара", "Мэри", "Люси", "Сюзанна", "Мария", "Ромашка", "Колокольчик", "Лиза", "Эбигейл", "Астра", "Пандора", "Кэт", "Бэт", "Черри", "Роза"]
 
 class Animal {
-    // Идентификатор
-    var id: Int = 1
     // Имя
     var name: String
     // Вес
@@ -137,7 +145,16 @@ class Animal {
     
     
     /// Init
-    init(myCoord: Coord) {
+    init(myCoord: Coord, myType: Type) {
+        // Get type
+        type = myType
+        // Get food type
+        switch type {
+        case .cow, .elephant, .goat, .horse, .sheep:
+            isPredator = false
+        default:
+            isPredator = true
+        }
         isFemale = Bool.random()
         coord = myCoord
         if isFemale {

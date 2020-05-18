@@ -206,7 +206,7 @@ class GameScene: SKScene {
         // Place all animals
         for i in 0..<env.animalCount {
             let coord = env.animals[i].coord
-            let tileName = env.animals[i].type.rawValue + env.animals[i].direction.rawValue
+            let tileName = env.animals[i].type.rawValue + env.animals[i].direction.label
             animalTileGroup = animalTileSet!.tileGroups.first {$0.name == tileName}
             animalLayer.setTileGroup(animalTileGroup, forColumn: coord.col, row: coord.row)
         }

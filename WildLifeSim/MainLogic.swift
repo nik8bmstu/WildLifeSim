@@ -29,8 +29,8 @@ class Environment {
             calcFood(map: map)
         }
         isDayTime = ((7 < hour) && (hour < 20)) ? true : false
+        animals.shuffle()
         for i in 0..<animalCount {
-            
             //print(animals[i].sayHello())
             switch Int.random(in: 0...1) {
             case 1:
@@ -47,72 +47,53 @@ class Environment {
         // Place animals
         for i in 0...1 {
             let coord = animalCoordRandomize()
-            var newAnimal = Animal(myCoord: coord)
+            var newAnimal = Animal(myCoord: coord, myType: .horse)
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
-            newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .down
-            newAnimal.type = .horse
             newAnimal.visibilityAround = 2
             newAnimal.visibilityForward = 5
             newAnimal.defineVisibleTiles(map: earth)
-            animalCount += 1
-            herbivorousCount += 1
-            // predatorCount += 1
             animals.append(newAnimal)
         }
         for i in 0...1 {
             let coord = animalCoordRandomize()
-            var newAnimal = Animal(myCoord: coord)
+            var newAnimal = Animal(myCoord: coord, myType: .cow)
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
-            newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .up
-            newAnimal.type = .cow
             newAnimal.visibilityAround = 1
             newAnimal.visibilityForward = 4
             newAnimal.defineVisibleTiles(map: earth)
-            animalCount += 1
-            herbivorousCount += 1
-            // predatorCount += 1
             animals.append(newAnimal)
         }
         for i in 0...1 {
             let coord = animalCoordRandomize()
-            var newAnimal = Animal(myCoord: coord)
+            var newAnimal = Animal(myCoord: coord, myType: .sheep)
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
-            newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .left
-            newAnimal.type = .sheep
             newAnimal.visibilityAround = 1
             newAnimal.visibilityForward = 3
             newAnimal.defineVisibleTiles(map: earth)
-            animalCount += 1
-            herbivorousCount += 1
-            // predatorCount += 1
             animals.append(newAnimal)
         }
         for i in 0...1 {
             let coord = animalCoordRandomize()
-            var newAnimal = Animal(myCoord: coord)
+            var newAnimal = Animal(myCoord: coord, myType: .goat)
             newAnimal.placeOnGround(earth: earth)
             newAnimal.sizeType = .medium
-            newAnimal.id = animalCount
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .right
-            newAnimal.type = .sheep
-            newAnimal.visibilityAround = 1
-            newAnimal.visibilityForward = 3
+            newAnimal.visibilityAround = 2
+            newAnimal.visibilityForward = 1
             newAnimal.defineVisibleTiles(map: earth)
-            animalCount += 1
-            //herbivorousCount += 1
-            predatorCount += 1
             animals.append(newAnimal)
         }
+        animalCount = animals.count
         currentAnimal = animals.endIndex
     }
     
