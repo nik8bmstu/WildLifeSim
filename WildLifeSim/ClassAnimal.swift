@@ -121,8 +121,8 @@ class Animal {
     // Очки действий
     var actionPoints: Int = 6
     // Поле видимости
-    var visibilityForward: Int = 4
-    var visibilityAround: Int = 1
+    var visibilityForward: Int = 5
+    var visibilityAround: Int = 2
     // Видимые объекты
     var visibleObjects: [visibleObject] = []
     // Текущий целевой объект
@@ -214,6 +214,9 @@ class Animal {
     
     /// Define available tiles
     func defineVisibleTiles(map: Ground) {
+        // Delete old
+        visibleTiles.removeAll()
+        visibleTiles.append(coord)
         defineVisibleTilesAround(map: map)
         defineVisibleTilesForward(map: map)
         var visibleTilesString = "\"\(name)\" видит следующие клетки: "

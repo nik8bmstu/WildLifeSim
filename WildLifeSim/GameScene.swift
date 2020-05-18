@@ -25,7 +25,6 @@ class GameScene: SKScene {
     let defFontSize: CGFloat = 25
     let defFontColor = SKColor.black
     let fontTypeAttribute = [ NSAttributedString.Key.font: UIFont.init(name: "American Typewriter", size: 25)]
-    //let fontSizeAttribute = [ NSAttributedString.Key.kern: "American Typewriter"]
     let blackAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.black ]
     let greenAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.green ]
     let redAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.red ]
@@ -55,6 +54,7 @@ class GameScene: SKScene {
     var waterTiles: SKTileGroup!
     var mountainTiles: SKTileGroup!
     var selectedTile: SKTileGroup!
+    var visibilityTile: SKTileGroup!
     var emptyTile: SKTileGroup!
     
     // Connect Food Tile set
@@ -82,9 +82,11 @@ class GameScene: SKScene {
     var foodLayer: SKTileMapNode!
     
     // Create labels
+    
     // Axis
     var axisHLabels: [SKLabelNode] = []
     var axisVLabels: [SKLabelNode] = []
+    
     // Status
     var step = SKLabelNode(text: "ШАГ")
     var day = SKLabelNode(text: "День: 0")
@@ -98,6 +100,7 @@ class GameScene: SKScene {
     var tileFood = SKLabelNode(text: "Еда: 0")
     var tileAcess = SKLabelNode(text: "Проходима")
     var tileEmpty = SKLabelNode(text: "Свободна")
+    
     // Animal
     var animalLabel = SKLabelNode(text: "Животное:")
     var animalName = SKLabelNode(text: "Имя")
@@ -132,7 +135,7 @@ class GameScene: SKScene {
         drawCurrentTileParam(earth: earth)
         drawCurrentObjectParam(earth: earth, env: env)
         drawAnimals(env: env)
-        drawSelect(col: tapColumn, row: tapRow)
+        drawSelect(col: tapColumn, row: tapRow, animalIndex: env.getAnimalIndex(coord: Coord(col: tapColumn, row: tapRow)))
     }
     
     /// Draw environment parameters
@@ -280,11 +283,15 @@ class GameScene: SKScene {
     }
     
     /// Draw select frame
-    func drawSelect(col: Int, row: Int) {
+    func drawSelect(col: Int, row: Int, animalIndex: Int) {
         selectFrame.removeAllChildren()
         frameLayer.fill(with: emptyTile)
         frameLayer.setTileGroup(selectedTile, forColumn: col, row: row)
-        
+        if env.getAnimalIndex(coord: Coord(col: col, row: row)) >= 0 {
+            for i in 1..<env.animals[animalIndex].visibleTiles.count {
+                frameLayer.setTileGroup(visibilityTile, forColumn: env.animals[animalIndex].visibleTiles[i].col, row: env.animals[animalIndex].visibleTiles[i].row)
+            }
+        }
         selectFrame.addChild(frameLayer)
     }
     
@@ -298,11 +305,10 @@ class GameScene: SKScene {
     /// Selection init
     func selectInit() {
         selectedTile = tileSet!.tileGroups.first  {$0.name == "frame"}!
+        visibilityTile = tileSet!.tileGroups.first  {$0.name == "visible"}!
         emptyTile = tileSet!.tileGroups.first  {$0.name == "empty"}!
         frameLayer = SKTileMapNode(tileSet: tileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         frameLayer.name = "frameLayer"
-        //frameLayer.fill(with: selectedTile)
-        //selectFrame.addChild(frameLayer)
     }
     
     /// Map Init
@@ -411,6 +417,7 @@ class GameScene: SKScene {
         tileLabel.horizontalAlignmentMode = .left
         
         let rightVertOffset: CGFloat = 30
+        
         // Tile Type
         tileType.fontName = defFontStyle
         tileType.fontSize = defFontSize - 5

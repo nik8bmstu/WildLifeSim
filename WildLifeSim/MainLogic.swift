@@ -54,6 +54,9 @@ class Environment {
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .down
             newAnimal.type = .horse
+            newAnimal.visibilityAround = 2
+            newAnimal.visibilityForward = 5
+            newAnimal.defineVisibleTiles(map: earth)
             animalCount += 1
             herbivorousCount += 1
             // predatorCount += 1
@@ -68,6 +71,9 @@ class Environment {
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .up
             newAnimal.type = .cow
+            newAnimal.visibilityAround = 1
+            newAnimal.visibilityForward = 4
+            newAnimal.defineVisibleTiles(map: earth)
             animalCount += 1
             herbivorousCount += 1
             // predatorCount += 1
@@ -82,6 +88,9 @@ class Environment {
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .left
             newAnimal.type = .sheep
+            newAnimal.visibilityAround = 1
+            newAnimal.visibilityForward = 3
+            newAnimal.defineVisibleTiles(map: earth)
             animalCount += 1
             herbivorousCount += 1
             // predatorCount += 1
@@ -96,6 +105,9 @@ class Environment {
             newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
             newAnimal.direction = .right
             newAnimal.type = .sheep
+            newAnimal.visibilityAround = 1
+            newAnimal.visibilityForward = 3
+            newAnimal.defineVisibleTiles(map: earth)
             animalCount += 1
             //herbivorousCount += 1
             predatorCount += 1
@@ -126,7 +138,7 @@ class Environment {
                 return i
             }
         }
-        return 0
+        return -1
     }
     
     /// Calc food count
