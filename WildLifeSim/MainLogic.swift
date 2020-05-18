@@ -62,60 +62,19 @@ class Environment {
     /// Init start animal pool
     func animalsInit() {
         // Place animals
-        for i in 0...1 {
-            let coord = animalCoordRandomize()
-            var newAnimal = Animal(myCoord: coord, myType: .horse)
-            newAnimal.placeOnGround(earth: earth)
-            newAnimal.visibilityAround = 2
-            newAnimal.visibilityForward = 5
-            newAnimal.defineVisibleTiles(map: earth)
-            animals.append(newAnimal)
-        }
-        for i in 0...1 {
-            let coord = animalCoordRandomize()
-            var newAnimal = Animal(myCoord: coord, myType: .cow)
-            newAnimal.placeOnGround(earth: earth)
-            newAnimal.visibilityAround = 1
-            newAnimal.visibilityForward = 4
-            newAnimal.defineVisibleTiles(map: earth)
-            animals.append(newAnimal)
-        }
-        for i in 0...1 {
-            let coord = animalCoordRandomize()
-            var newAnimal = Animal(myCoord: coord, myType: .sheep)
-            newAnimal.placeOnGround(earth: earth)
-            newAnimal.visibilityAround = 1
-            newAnimal.visibilityForward = 3
-            newAnimal.defineVisibleTiles(map: earth)
-            animals.append(newAnimal)
-        }
-        for i in 0...1 {
-            let coord = animalCoordRandomize()
-            var newAnimal = Animal(myCoord: coord, myType: .goat)
-            newAnimal.placeOnGround(earth: earth)
-            newAnimal.size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
-            newAnimal.visibilityAround = 2
-            newAnimal.visibilityForward = 1
-            newAnimal.defineVisibleTiles(map: earth)
-            animals.append(newAnimal)
+        for _ in 0...1 {
+            animals.append(Animal(map: earth, myType: .sheep))
+            animals.append(Animal(map: earth, myType: .cow))
+            animals.append(Animal(map: earth, myType: .horse))
+            animals.append(Animal(map: earth, myType: .goat))
         }
         animalCount = animals.count
+        for i in 0..<animalCount {
+            animals[i].defineVisibleTiles(map: earth)
+        }
     }
     
-    /// Find empty location for animal
-    func animalCoordRandomize() -> Coord {
-        var isOk = false
-        var perfectCoord = Coord(col: 0, row: 0)
-        while !isOk {
-            let col = Int.random(in: 0..<earth.sizeHorizontal)
-            let row = Int.random(in: 0..<earth.sizeVertical)
-            if (earth.tiles[col][row].isEmpty && earth.tiles[col][row].isAcessable)  {
-                isOk = true
-                perfectCoord = Coord(col: col, row: row)
-            }
-        }
-        return perfectCoord
-    }
+    
     
     /// Return animal index by coord
     func getAnimalIndex(coord: Coord) -> Int {

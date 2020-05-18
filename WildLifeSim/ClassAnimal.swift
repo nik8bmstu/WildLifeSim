@@ -8,20 +8,7 @@
 
 import Foundation
 
-let smallSizeMin = 1
-let smallSizeMax = 25
-let smallSizeInitMin = 10
-let smallSizeInitMax = 20
 
-let mediumSizeMin = 50
-let mediumSizeMax = 90
-let mediumSizeInitMin = 65
-let mediumSizeInitMax = 80
-
-let largeSizeMin = 90
-let largeSizeMax = 150
-let largeSizeInitMin = 110
-let largeSizeInitMax = 130
 
 enum Type: String {
     case cow = "cow"
@@ -68,6 +55,42 @@ enum Type: String {
             return "Петух"
         }
     }
+    var visForward: Int {
+        switch self {
+        case .cow:
+            return 3
+        case .horse:
+            return 5
+        case .elephant:
+            return 2
+        case .sheep:
+            return 3
+        case .goat:
+            return 4
+        case .tiger:
+            return 7
+        case .chicken:
+            return 2
+        }
+    }
+    var visAround: Int {
+        switch self {
+        case .cow:
+            return 2
+        case .horse:
+            return 2
+        case .elephant:
+            return 1
+        case .sheep:
+            return 1
+        case .goat:
+            return 1
+        case .tiger:
+            return 0
+        case .chicken:
+            return 1
+        }
+    }
 }
     
 enum SizeType: String {
@@ -83,6 +106,46 @@ enum SizeType: String {
             return 20
         case .large:
             return 30
+        }
+    }
+    var initSizeMin: Int {
+        switch self {
+        case .small:
+            return 10
+        case .medium:
+            return 65
+        case .large:
+            return 110
+        }
+    }
+    var initSizeMax: Int {
+        switch self {
+        case .small:
+            return 20
+        case .medium:
+            return 80
+        case .large:
+            return 130
+        }
+    }
+    var sizeMin: Int {
+        switch self {
+        case .small:
+            return 5
+        case .medium:
+            return 45
+        case .large:
+            return 90
+        }
+    }
+    var sizeMax: Int {
+        switch self {
+        case .small:
+            return 25
+        case .medium:
+            return 85
+        case .large:
+            return 150
         }
     }
 }
@@ -132,8 +195,8 @@ class Animal {
     // Имя
     var name: String
     // Вес
-    var size: Int = mediumSizeInitMax
     var sizeType: SizeType = .medium
+    var size: Int
     // Тип
     var type: Type = .cow
     var isPredator: Bool = false
@@ -141,27 +204,24 @@ class Animal {
     var age: Int = 0
     var isAlive: Bool = true
     // Параметры расположения
-    var coord: Coord
+    var coord: Coord = Coord(col: 0, row: 0)
     var direction: Direction = .down
     // Пол
     var isFemale: Bool
     var isPregnant: Bool = false
     // Очки действий
     var actionPoints: Int = 6
-    // Поле видимости
-    var visibilityForward: Int = 5
-    var visibilityAround: Int = 2
     // Видимые объекты
     var visibleObjects: [visibleObject] = []
     // Текущий целевой объект
-    var targetObject: visibleObject
+    var targetObject: visibleObject = visibleObject(tile: Coord(col: 0, row: 0), interestLevel: 0, type: .sleep)
     // Видимые клетки
     var visibleTiles: [Coord] = []
     // legend
     var legend: String = ""
     
     /// Init
-    init(myCoord: Coord, myType: Type) {
+    init(map: Ground, myType: Type) {
         // Get type
         type = myType
         // Get food type
@@ -175,18 +235,14 @@ class Animal {
         switch type {
         case .chicken:
             sizeType = .small
-            size = Int.random(in: smallSizeInitMin...smallSizeInitMax)
         case .elephant:
             sizeType = .large
-            size = Int.random(in: largeSizeInitMin...largeSizeInitMax)
         default:
             sizeType = .medium
-            size = Int.random(in: mediumSizeInitMin...mediumSizeInitMax)
         }
+        size = Int.random(in: sizeType.initSizeMin...sizeType.initSizeMax)
         // Chose gender
         isFemale = Bool.random()
-        // Get coord
-        coord = myCoord
         // Chose name
         if isFemale {
             name = femaleNames[Int.random(in: 0..<femaleNames.count)]
@@ -205,11 +261,16 @@ class Animal {
         default:
             direction = .right
         }
-        // define target and visible tiles
-        targetObject = visibleObject(tile: myCoord, interestLevel: 0, type: .sleep)
+        // Get coord
+        coord = startCoordRandomize(map: map)
+        // Define target and visible tiles
+        targetObject = visibleObject(tile: coord, interestLevel: 0, type: .sleep)
         visibleObjects.append(targetObject)
-        visibleObjects.append(visibleObject(tile: myCoord, interestLevel: 0, type: .look))
-        visibleTiles.append(myCoord)
+        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .look))
+        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward))
+        visibleTiles.append(coord)
+        // Take own tile
+        placeOnGround(earth: map)
     }
     
     func placeOnGround(earth: Ground) {
@@ -223,11 +284,11 @@ class Animal {
     /// Look
     func look(map: Ground, neighbors: Environment) {
         legend.append("\"\(name)\" осматривается ")
-        // Delete old objects excepting sleep and look
-        if visibleObjects.count > 2 {
+        // Delete old objects
+        if visibleObjects.count > 3 {
             let count = visibleObjects.count
-            for _ in 2..<count {
-                visibleObjects.remove(at: 2)
+            for _ in 3..<count {
+                visibleObjects.remove(at: 3)
             }
         }
         // Find new objects
@@ -235,7 +296,12 @@ class Animal {
         legend.append("и находит следующие возможности:\n")
         // Print new object list
         for i in 0..<visibleObjects.count {
-            legend.append("- \(visibleObjects[i].type.rawValue) на клетке \(transformCoord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row))\n")
+            let tileCoord = Coord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row)
+            var stringCoord = "\n"
+            if tileCoord.col != coord.col || tileCoord.row != coord.row {
+                stringCoord = " на клетке \(transformCoord(col: tileCoord.col, row: tileCoord.row))\n"
+            }
+            legend.append("- \(visibleObjects[i].type.rawValue)" + stringCoord)
         }
     }
     
@@ -330,8 +396,8 @@ class Animal {
     /// Define visible tiles around
     func defineVisibleTilesAround(map: Ground) {
         let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
-         for row in (coord.row - visibilityAround)...(coord.row + visibilityAround) {
-            for col in (coord.col - visibilityAround)...(coord.col + visibilityAround) {
+        for row in (coord.row - type.visAround)...(coord.row + type.visAround) {
+            for col in (coord.col - type.visAround)...(coord.col + type.visAround) {
                 let checkCoord = Coord(col: col, row: row)
                 if isTileExist(coord: checkCoord, limit: limitCoord) {
                     if !isTileAlreadyVisible(coord: checkCoord) {
@@ -351,16 +417,16 @@ class Animal {
         var visDown = 1
         switch direction {
         case .down:
-            visDown = visibilityForward
+            visDown = type.visForward
             visUp = 0
         case .left:
-            visLeft = visibilityForward
+            visLeft = type.visForward
             visRight = 0
         case .right:
-            visRight = visibilityForward
+            visRight = type.visForward
             visLeft = 0
         default: // .up
-            visUp = visibilityForward
+            visUp = type.visForward
             visDown = 0
         }
         
@@ -400,6 +466,21 @@ class Animal {
     func transformCoord(col: Int, row: Int) -> String {
         let name = String(UnicodeScalar(UInt8(64 - row + earth.sizeVertical))) + "-" + String(col + 1)
         return name
+    }
+    
+    /// Find empty location for animal
+    func startCoordRandomize(map: Ground) -> Coord {
+        var isOk = false
+        var perfectCoord = Coord(col: 0, row: 0)
+        while !isOk {
+            let col = Int.random(in: 0..<map.sizeHorizontal)
+            let row = Int.random(in: 0..<map.sizeVertical)
+            if (map.tiles[col][row].isEmpty && map.tiles[col][row].isAcessable) {
+                isOk = true
+                perfectCoord = Coord(col: col, row: row)
+            }
+        }
+        return perfectCoord
     }
     
     /// Say hello
