@@ -232,6 +232,7 @@ class GameScene: SKScene {
                 objInfo.addChild(animalSize)
                 
                 legend.text = env.animals[index].legend
+                legend = multipleLineText(labelIn: legend)
                 envInfo.addChild(legend)
             } else {
                 
@@ -558,4 +559,31 @@ class GameScene: SKScene {
         let name = String(UnicodeScalar(UInt8(64 - row + earth.sizeVertical))) + "-" + String(col + 1)
         return name
     }
+    
+    /// Add multiline label
+    func multipleLineText(labelIn: SKLabelNode) -> SKLabelNode {
+        let subStrings:[String] = labelIn.text!.components(separatedBy: "\n")
+        var labelOut = SKLabelNode()
+        var subStringNumber:Int = 0
+        for subString in subStrings {
+            let labelTemp = SKLabelNode(fontNamed: labelIn.fontName)
+            labelTemp.text = subString
+            labelTemp.fontColor = labelIn.fontColor
+            labelTemp.fontSize = labelIn.fontSize
+            labelTemp.position = labelIn.position
+            labelTemp.horizontalAlignmentMode = labelIn.horizontalAlignmentMode
+            labelTemp.verticalAlignmentMode = labelIn.verticalAlignmentMode
+            let y:CGFloat = CGFloat(subStringNumber) * labelIn.fontSize
+            if subStringNumber == 0 {
+                labelOut = labelTemp
+                subStringNumber += 1
+            } else {
+                labelTemp.position = CGPoint(x: 0, y: -y)
+                labelOut.addChild(labelTemp)
+                subStringNumber += 1
+            }
+        }
+        return labelOut
+    }
+    
 }

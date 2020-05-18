@@ -20,7 +20,6 @@ class Environment {
     
     // Logic step
     func hourStep(map: Ground) {
-        //print("Time = \(hour):00")
         hour += 1
         if hour == 24 {
             hour = 0
@@ -30,7 +29,7 @@ class Environment {
         isDayTime = ((7 < hour) && (hour < 20)) ? true : false
         animals.shuffle()
         for i in 0..<animalCount {
-            //print(animals[i].sayHello())
+            animals[i].legend = ""
             switch Int.random(in: 0...1) {
             case 1:
                 animals[i].rotateLeft()

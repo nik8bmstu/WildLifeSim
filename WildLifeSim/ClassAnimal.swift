@@ -200,12 +200,11 @@ class Animal {
         visibleObjects.append(targetObject)
         visibleObjects.append(visibleObject(tile: myCoord, interestLevel: 0, type: .look))
         visibleTiles.append(myCoord)
-        legend = sayHello()
     }
     
     func placeOnGround(earth: Ground) {
         earth.tiles[coord.col][coord.row].isEmpty = false
-        print("Animal placed at \(coord)")
+        //print("Animal placed at \(coord)")
     }
     
     
@@ -213,8 +212,7 @@ class Animal {
     
     /// Look
     func look(map: Ground) {
-        print(" ")
-        print("\"\(name)\" осматривается...")
+        legend.append("\"\(name)\" осматривается...\n")
         // Delete old objects excepting sleep and look
         if visibleObjects.count > 2 {
             let count = visibleObjects.count
@@ -224,10 +222,10 @@ class Animal {
         }
         // Find new objects
         findObjects(map: map)
-        print("\"\(name)\" находит следующие возможности:")
+        legend.append("\"\(name)\" находит следующие возможности:\n")
         // Print new object list
         for i in 0..<visibleObjects.count {
-            print("\(visibleObjects[i].type.rawValue) на клетке \(transformCoord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row))")
+            legend.append("\(visibleObjects[i].type.rawValue) на клетке \(transformCoord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row))\n")
         }
     }
     
