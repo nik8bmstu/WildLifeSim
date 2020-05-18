@@ -222,7 +222,7 @@ class GameScene: SKScene {
                 let type = env.animals[index].isFemale ? env.animals[index].type.labelF : env.animals[index].type.labelM
                 animalName.text = env.animals[index].name
                 animalName.fontColor = color
-                animalSize.text = type + "- " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
+                animalSize.text = type + " - " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
                 objInfo.addChild(animalLabel)
                 objInfo.addChild(animalName)
                 objInfo.addChild(animalSize)

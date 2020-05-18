@@ -30,6 +30,8 @@ class Environment {
         }
         isDayTime = ((7 < hour) && (hour < 20)) ? true : false
         for i in 0..<animalCount {
+            animals[i].look(map: earth)
+            print(animals[i].sayHello())
             switch Int.random(in: 0...1) {
             case 1:
                 animals[i].rotateLeft()
