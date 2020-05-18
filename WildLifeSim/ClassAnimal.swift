@@ -122,7 +122,7 @@ class Animal {
     var actionPoints: Int = 6
     // Поле видимости
     var visibilityForward: Int = 4
-    var visibilityAround: Int = 2
+    var visibilityAround: Int = 1
     // Видимые объекты
     var visibleObjects: [visibleObject] = []
     // Текущий целевой объект
@@ -215,7 +215,7 @@ class Animal {
     /// Define available tiles
     func defineVisibleTiles(map: Ground) {
         defineVisibleTilesAround(map: map)
-        
+        defineVisibleTilesForward(map: map)
         var visibleTilesString = "\"\(name)\" видит следующие клетки: "
         visibleTilesString.append("\(transformCoord(col: visibleTiles[0].col, row: visibleTiles[0].row))")
         if visibleTiles.count > 1 {
@@ -241,6 +241,41 @@ class Animal {
         }
     }
     
+    /// Define visible tiles forward
+    func defineVisibleTilesForward(map: Ground) {
+        let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
+        var visLeft = 1
+        var visRight = 1
+        var visUp = 1
+        var visDown = 1
+        switch direction {
+        case .down:
+            visDown = visibilityForward
+            visUp = 0
+        case .left:
+            visLeft = visibilityForward
+            visRight = 0
+        case .right:
+            visRight = visibilityForward
+            visLeft = 0
+        default: // .up
+            visUp = visibilityForward
+            visDown = 0
+        }
+        
+        for row in (coord.row - visDown)...(coord.row + visUp) {
+            for col in (coord.col - visLeft)...(coord.col + visRight) {
+                let checkCoord = Coord(col: col, row: row)
+                if isTileExist(coord: checkCoord, limit: limitCoord) {
+                    if !isTileAlreadyVisible(coord: checkCoord) {
+                        visibleTiles.append(checkCoord)
+                    }
+                }
+            }
+        }
+         
+    }
+    
     /// Is tile exist
     func isTileExist(coord: Coord, limit: Coord) -> Bool {
         if ((coord.col >= 0) && (coord.col < limit.col) && (coord.row >= 0)  && (coord.row < limit.row)) {
@@ -251,7 +286,11 @@ class Animal {
     
     /// Is tile exist
     func isTileAlreadyVisible(coord: Coord) -> Bool {
-        
+        for i in 0..<visibleTiles.count {
+            if ((visibleTiles[i].col == coord.col) && (visibleTiles[i].row == coord.row)) {
+                return true
+            }
+        }
         return false
     }
     
