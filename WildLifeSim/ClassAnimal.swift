@@ -8,7 +8,7 @@
 
 import Foundation
 
-
+let demandLevelMax = 10
 
 enum Type: String {
     case cow = "cow"
@@ -203,6 +203,10 @@ class Animal {
     // Возраст
     var age: Int = 0
     var isAlive: Bool = true
+    // Нужды
+    var hungerDemand: Int = 5
+    var thirstDemand: Int = 2
+    var sleepDemand: Int = 0
     // Параметры расположения
     var coord: Coord = Coord(col: 0, row: 0)
     var direction: Direction = .down
@@ -294,14 +298,39 @@ class Animal {
         // Find new objects
         findObjects(map: map, neighbors: neighbors)
         legend.append("и находит следующие возможности:\n")
-        // Print new object list
+    }
+    
+    /// Think
+    func think(map: Ground, neighbors: Environment) {
+        
         for i in 0..<visibleObjects.count {
             let tileCoord = Coord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row)
-            var stringCoord = "\n"
-            if tileCoord.col != coord.col || tileCoord.row != coord.row {
-                stringCoord = " на клетке \(transformCoord(col: tileCoord.col, row: tileCoord.row))\n"
+            let way = wayLength(target: tileCoord)
+            switch visibleObjects[i].type {
+            case .food:
+                visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * hungerDemand - way * way
+            case .water:
+                visibleObjects[i].interestLevel = thirstDemand * thirstDemand - way / 2
+            case .partner:
+                visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand
+            case .danger:
+                visibleObjects[i].interestLevel = 100 / way
+            case .forward:
+                visibleObjects[i].interestLevel = thirstDemand * hungerDemand - sleepDemand * 2
+            case .look:
+                visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand
+            default: // sleep
+                visibleObjects[i].interestLevel = sleepDemand * sleepDemand * 4 - hungerDemand * thirstDemand
             }
-            legend.append("- \(visibleObjects[i].type.rawValue)" + stringCoord)
+            if visibleObjects[i].interestLevel < 0 {
+                visibleObjects[i].interestLevel = 0
+            }
+            // Print objects of interest list
+            var stringCoord = ""
+            if tileCoord.col != coord.col || tileCoord.row != coord.row {
+                stringCoord = " на клетке \(transformCoord(col: tileCoord.col, row: tileCoord.row))"
+            }
+            legend.append("- \(visibleObjects[i].type.rawValue)" + stringCoord + " - (\(visibleObjects[i].interestLevel))\n")
         }
     }
     
@@ -337,6 +366,13 @@ class Animal {
     
     
     // Stuff functions
+    
+    /// Grow demands
+    func demandsGrow() {
+        sleepDemand += 1
+        hungerDemand += 1
+        thirstDemand += 1
+    }
     
     /// Find objects
     func findObjects(map: Ground, neighbors: Environment) {
@@ -451,7 +487,7 @@ class Animal {
         return false
     }
     
-    /// Is tile exist
+    /// Is tile visible
     func isTileAlreadyVisible(coord: Coord) -> Bool {
         for i in 0..<visibleTiles.count {
             if ((visibleTiles[i].col == coord.col) && (visibleTiles[i].row == coord.row)) {
@@ -461,6 +497,12 @@ class Animal {
         return false
     }
     
+    /// Calculate way length
+    func wayLength(target: Coord) -> Int {
+        var actions = 0
+        actions = abs(target.col - coord.col) + abs(target.row - coord.row) // Wrong method, only for first tests!
+        return actions
+    }
     
     /// Transform tile coord to Literal-Numeric
     func transformCoord(col: Int, row: Int) -> String {
