@@ -23,6 +23,10 @@ let largeSizeMax = 150
 let largeSizeInitMin = 110
 let largeSizeInitMax = 130
 
+
+let initFoodInterest = 10
+let initWaterInterest = 5
+
 enum Type: String {
     case cow = "cow"
     case horse = "horse"
@@ -111,6 +115,7 @@ class Animal {
     var sizeType: SizeType = .medium
     // Тип
     var type: Type = .cow
+    var isPredator: Bool = false
     // Возраст
     var age: Int = 0
     // Параметры расположения
@@ -160,8 +165,9 @@ class Animal {
         print("\"\(name)\" осматривается...")
         // Delete old objects excepting sleep and look
         if visibleObjects.count > 2 {
-            for i in 2..<visibleObjects.count {
-                visibleObjects.remove(at: i)
+            let count = visibleObjects.count
+            for _ in 2..<count {
+                visibleObjects.remove(at: 2)
             }
         }
         // Find new objects
@@ -169,7 +175,7 @@ class Animal {
         print("\"\(name)\" находит следующие возможности:")
         // Print new object list
         for i in 0..<visibleObjects.count {
-            print("\(visibleObjects[i].type.rawValue) на клетке \(transformCoord(col: coord.col, row: coord.row))")
+            print("\(visibleObjects[i].type.rawValue) на клетке \(transformCoord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row))")
         }
     }
     
@@ -209,7 +215,18 @@ class Animal {
     /// Find objects
     func findObjects(map: Ground) {
         defineVisibleTiles(map: map)
-        
+        for i in 1..<visibleTiles.count {
+            let currentCoord = Coord(col: visibleTiles[i].col, row: visibleTiles[i].row)
+            let tile = map.tiles[currentCoord.col][currentCoord.row]
+            if (tile.foodCount > 0) && !isPredator {
+                let object = visibleObject(tile: currentCoord, interestLevel: initFoodInterest * tile.foodCount, type: .food)
+                visibleObjects.append(object)
+            }
+            if tile.waterHere {
+                let object = visibleObject(tile: currentCoord, interestLevel: initWaterInterest, type: .water)
+                visibleObjects.append(object)
+            }
+        }
     }
     
     /// Define available tiles
