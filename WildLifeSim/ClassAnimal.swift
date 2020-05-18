@@ -172,9 +172,9 @@ struct Coord {
 }
 
 enum visObjType: String {
-    case danger = "Избежать опасности"
+    case danger = "Убежать от хищника"
     case food = "Добыть еды"
-    case partner = "Найти партнера"
+    case partner = "Подойти к партнеру"
     case water = "Выпить воды"
     case sleep = "Поспать"
     case look = "Осмотреться"
@@ -226,7 +226,7 @@ class Animal {
         type = myType
         // Get food type
         switch type {
-        case .cow, .elephant, .goat, .horse, .sheep:
+        case .cow, .elephant, .goat, .sheep, .chicken, .horse:
             isPredator = false
         default:
             isPredator = true
