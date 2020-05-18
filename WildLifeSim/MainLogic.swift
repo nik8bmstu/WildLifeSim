@@ -67,6 +67,7 @@ class Environment {
             animals.append(Animal(map: earth, myType: .cow))
             animals.append(Animal(map: earth, myType: .horse))
             animals.append(Animal(map: earth, myType: .goat))
+            animals.append(Animal(map: earth, myType: .chicken))
         }
         animalCount = animals.count
         for i in 0..<animalCount {
