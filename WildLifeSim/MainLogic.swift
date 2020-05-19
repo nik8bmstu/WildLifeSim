@@ -13,6 +13,7 @@ class Environment {
     var day: Int = 0
     var isDayTime: Bool = false
     var foodCount: Int = 0
+    var totalAnimalCount: Int = 0
     var animalCount: Int = 0
     var herbivorousCount: Int = 0
     var predatorCount: Int = 0
@@ -68,6 +69,7 @@ class Environment {
             animals.append(Animal(map: earth, myType: .chicken))
         }
         animalCount = animals.count
+        totalAnimalCount = animalCount
         for i in 0..<animalCount {
             animals[i].defineVisibleTiles(map: earth)
         }

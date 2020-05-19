@@ -12,6 +12,8 @@ import GameplayKit
 
 
 class GameScene: SKScene {
+    var animalId = 0
+    
     var map = SKNode()
     var foodMap = SKNode()
     var envInfo = SKNode()
@@ -137,6 +139,17 @@ class GameScene: SKScene {
         drawCurrentObjectParam(earth: earth, env: env)
         drawAnimals(env: env)
         drawSelect(col: tapColumn, row: tapRow, animalIndex: env.getAnimalIndex(coord: Coord(col: tapColumn, row: tapRow)))
+        follow(env: env)
+    }
+    
+    func follow(env: Environment){
+        for i in 0..<env.animalCount {
+            if env.animals[i].uniqueID == animalId {
+                tapColumn = env.animals[i].coord.col
+                tapRow = env.animals[i].coord.row
+                break
+            }
+        }
     }
     
     /// Draw environment parameters
@@ -536,6 +549,11 @@ class GameScene: SKScene {
         let layer = map.childNode(withName: "botLayer")! as! SKTileMapNode
         tapColumn = layer.tileColumnIndex(fromPosition: pointResized)
         tapRow = layer.tileRowIndex(fromPosition: pointResized)
+        if !earth.tiles[tapColumn][tapRow].isEmpty && earth.tiles[tapColumn][tapRow].meatCount == 0 {
+            let index = env.getAnimalIndex(coord: Coord(col: tapColumn, row: tapRow))
+            animalId = env.animals[index].uniqueID
+        }
+        
         //print("Map tapped at Column: \(tapColumn) Row: \(tapRow)")
     }
     

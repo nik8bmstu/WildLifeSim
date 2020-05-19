@@ -197,6 +197,7 @@ let femaleNames: [String] = ["София", "Дейзи", "Кара", "Дора",
 class Animal {
     // Имя
     var name: String
+    var uniqueID: Int
     // Вес
     var sizeType: SizeType = .medium
     var size: Int
@@ -260,6 +261,7 @@ class Animal {
         } else {
             name = maleNames[Int.random(in: 0..<maleNames.count)]
         }
+        uniqueID = Int.random(in: Int.min...Int.max)
         // Chose direction
         let dir = Int.random(in: 0...3)
         switch dir {
