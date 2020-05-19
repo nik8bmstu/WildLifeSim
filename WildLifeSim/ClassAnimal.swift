@@ -177,14 +177,17 @@ enum visObjType: String {
     case partner = "Подойти к партнеру"
     case water = "Выпить воды"
     case sleep = "Поспать"
-    case look = "Осмотреться"
+    case lookLeft = "Повернуться налево"
+    case lookRight = "Повернуться направо"
     case forward = "Идти дальше"
+    case initial = ""
 }
 
 struct visibleObject {
     var tile: Coord
     var interestLevel: Int
     var type: visObjType
+    var description: String
 }
 
 
@@ -218,11 +221,15 @@ class Animal {
     // Видимые объекты
     var visibleObjects: [visibleObject] = []
     // Текущий целевой объект
-    var targetObject: visibleObject = visibleObject(tile: Coord(col: 0, row: 0), interestLevel: 0, type: .sleep)
+    var targetObject: visibleObject = visibleObject(tile: Coord(col: 0, row: 0), interestLevel: 0, type: .initial, description: "")
     // Видимые клетки
     var visibleTiles: [Coord] = []
     // legend
     var legend: String = ""
+    // Previos act was successful
+    var isActOK: Bool = false
+    // Last rotation
+    var lastRotate: Direction = .right
     
     /// Init
     init(map: Ground, myType: Type) {
@@ -268,10 +275,11 @@ class Animal {
         // Get coord
         coord = startCoordRandomize(map: map)
         // Define target and visible tiles
-        targetObject = visibleObject(tile: coord, interestLevel: 0, type: .sleep)
+        targetObject = visibleObject(tile: coord, interestLevel: 0, type: .sleep, description: "")
         visibleObjects.append(targetObject)
-        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .look))
-        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward))
+        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookLeft, description: ""))
+        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookRight, description: ""))
+        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward, description: ""))
         visibleTiles.append(coord)
         // Take own tile
         placeOnGround(earth: map)
@@ -289,10 +297,10 @@ class Animal {
     func look(map: Ground, neighbors: Environment) {
         legend.append("\"\(name)\" осматривается ")
         // Delete old objects
-        if visibleObjects.count > 3 {
+        if visibleObjects.count > 4 {
             let count = visibleObjects.count
-            for _ in 3..<count {
-                visibleObjects.remove(at: 3)
+            for _ in 4..<count {
+                visibleObjects.remove(at: 4)
             }
         }
         // Find new objects
@@ -302,7 +310,8 @@ class Animal {
     
     /// Think
     func think(map: Ground, neighbors: Environment) {
-        
+        var decide = 0
+        var decideLevel = 0
         for i in 0..<visibleObjects.count {
             let tileCoord = Coord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row)
             let way = wayLength(target: tileCoord)
@@ -312,26 +321,82 @@ class Animal {
             case .water:
                 visibleObjects[i].interestLevel = thirstDemand * thirstDemand - way / 2
             case .partner:
-                visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand
+                visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand + age
             case .danger:
                 visibleObjects[i].interestLevel = 100 / way
             case .forward:
-                visibleObjects[i].interestLevel = thirstDemand * hungerDemand - sleepDemand * 2
-            case .look:
+                if targetObject.type == .forward {
+                    targetObject.interestLevel = 0
+                    visibleObjects[i].interestLevel = hungerDemand * 2
+                } else {
+                    visibleObjects[i].interestLevel = thirstDemand * hungerDemand - sleepDemand * 2
+                }
+            case .lookLeft:
                 visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand
+                if targetObject.type == .lookRight {
+                    visibleObjects[i].interestLevel = 0
+                } else if lastRotate == .left {
+                    visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand * 2
+                }
+            case .lookRight:
+                visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand
+                if targetObject.type == .lookLeft {
+                    visibleObjects[i].interestLevel = 0
+                } else if lastRotate == .right {
+                    visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand * 2
+                }
             default: // sleep
                 visibleObjects[i].interestLevel = sleepDemand * sleepDemand * 4 - hungerDemand * thirstDemand
             }
             if visibleObjects[i].interestLevel < 0 {
                 visibleObjects[i].interestLevel = 0
             }
+            
+            if visibleObjects[i].interestLevel > decideLevel {
+                decideLevel = visibleObjects[i].interestLevel
+                decide = i
+            }
             // Print objects of interest list
             var stringCoord = ""
             if tileCoord.col != coord.col || tileCoord.row != coord.row {
                 stringCoord = " на клетке \(transformCoord(col: tileCoord.col, row: tileCoord.row))"
             }
-            legend.append("- \(visibleObjects[i].type.rawValue)" + stringCoord + " - (\(visibleObjects[i].interestLevel))\n")
+            visibleObjects[i].description = "- \(visibleObjects[i].type.rawValue)" + stringCoord + " - (\(visibleObjects[i].interestLevel))\n"
+            legend.append(visibleObjects[i].description)
         }
+        if targetObject.interestLevel < decideLevel {
+            targetObject = visibleObjects[decide]
+            legend.append("\"\(name)\" решает " + targetObject.description)
+        } else {
+            legend.append("\"\(name)\" решает не менять цель")
+            legend.append(targetObject.description)
+        }
+    }
+    
+    /// Act
+    func act(map: Ground, neighbors: Environment) {
+        isActOK = false
+        switch targetObject.type {
+        case .lookLeft:
+            rotateLeft()
+            isActOK = true
+        case .lookRight:
+            rotateRight()
+            isActOK = true
+        case .sleep:
+            sleep()
+            isActOK = true
+        case .forward:
+            goForward(map: map)
+        default:
+            isActOK = true
+        }
+        if isActOK {
+            legend.append("\"\(name)\" успешно выполнил задуманное\n")
+        } else {
+            legend.append("\"\(name)\" не смог выполнить задуманное\n")
+        }
+        
     }
     
     // Actions
@@ -348,6 +413,7 @@ class Animal {
         default:
             direction = .down
         }
+        lastRotate = .left
     }
     
     /// Rotate right
@@ -362,8 +428,39 @@ class Animal {
         default:
             direction = .up
         }
+        lastRotate = .right
     }
     
+    /// Go forward
+    func goForward(map: Ground) {
+        isActOK = false
+        var targetCoord: Coord = coord
+        switch direction {
+        case .down:
+            targetCoord.row -= 1
+        case .right:
+            targetCoord.col += 1
+        case .up:
+            targetCoord.row += 1
+        case .left:
+            targetCoord.col -= 1
+        }
+        let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
+        if isTileExist(coord: targetCoord, limit: limitCoord) {
+            let tile = map.tiles[targetCoord.col][targetCoord.row]
+            if tile.isEmpty && tile.isAcessable {
+                map.tiles[coord.col][coord.row].isEmpty = true
+                coord = targetCoord
+                map.tiles[coord.col][coord.row].isEmpty = false
+                isActOK = true
+            }
+        }
+    }
+    
+    /// Sleep
+    func sleep() {
+        sleepDemand = sleepDemand / 2
+    }
     
     // Stuff functions
     
@@ -377,15 +474,16 @@ class Animal {
     /// Find objects
     func findObjects(map: Ground, neighbors: Environment) {
         defineVisibleTiles(map: map)
+        // 0 is animal position, so i from 1
         for i in 1..<visibleTiles.count {
             let currentCoord = Coord(col: visibleTiles[i].col, row: visibleTiles[i].row)
             let tile = map.tiles[currentCoord.col][currentCoord.row]
             if (tile.foodCount > 0) && !isPredator {
-                let object = visibleObject(tile: currentCoord, interestLevel: tile.foodCount, type: .food)
+                let object = visibleObject(tile: currentCoord, interestLevel: tile.foodCount, type: .food, description: "")
                 visibleObjects.append(object)
             }
             if tile.waterHere {
-                let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .water)
+                let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .water, description: "")
                 visibleObjects.append(object)
             }
             if !tile.isEmpty {
@@ -396,13 +494,13 @@ class Animal {
                     if !isPredator {
                         // If it is a predator and bigger than me
                         if (neighbors.animals[index].isPredator && neighbors.animals[index].size > size) {
-                            let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .danger)
+                            let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .danger, description: "")
                             visibleObjects.append(object)
                         } else if ((neighbors.animals[index].isFemale != isFemale) && (neighbors.animals[index].type == type)) {
                             // Same type, but another gender
                             if (!neighbors.animals[index].isPregnant && !isPregnant) {
                                 // No one is pregnant
-                                let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .partner)
+                                let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .partner, description: "")
                                 visibleObjects.append(object)
                             }
                         }

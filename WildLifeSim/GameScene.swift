@@ -201,6 +201,7 @@ class GameScene: SKScene {
     
     /// Draw animals
     func drawAnimals(env: Environment) {
+        animalLayer.fill(with: emptyTile)
         animalsMap.removeAllChildren()
         // Place all animals
         for i in 0..<env.animalCount {

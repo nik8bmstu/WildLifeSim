@@ -18,7 +18,7 @@ class Environment {
     var predatorCount: Int = 0
     var animals: [Animal] = []
     
-    // Logic step
+    // Logic step: act, look, think, repeat ;)
     func hourStep(map: Ground) {
         hour += 1
         if hour == 24 {
@@ -31,15 +31,12 @@ class Environment {
         var deadAnimals: Int = 0
         for i in 0..<animalCount {
             animals[i].legend = ""
-            switch Int.random(in: 0...1) {
-            case 1:
-                animals[i].rotateLeft()
-            default:
-                animals[i].rotateRight()
-            }
+            // Act from previous step is first for correct environment
+            animals[i].act(map: earth, neighbors: self)
             animals[i].demandsGrow()
             animals[i].look(map: earth, neighbors: self)
             animals[i].think(map: earth, neighbors: self)
+            
             if hour == 0 {
                 animals[i].birthday()
                 if !animals[i].isAlive {
