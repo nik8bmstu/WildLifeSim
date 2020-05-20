@@ -281,7 +281,6 @@ class Animal {
         visibleObjects.append(targetObject)
         visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookLeft, description: ""))
         visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookRight, description: ""))
-        //visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward, description: ""))
         visibleTiles.append(coord)
         // Take own tile
         placeOnGround(earth: map)
@@ -299,12 +298,7 @@ class Animal {
     func look(map: Ground, neighbors: Environment) {
         legend.append("\"\(name)\" осматривается ")
         // Delete old objects
-        if visibleObjects.count > 3 {
-            let count = visibleObjects.count
-            for _ in 3..<count {
-                visibleObjects.remove(at: 3)
-            }
-        }
+        visibleObjects.removeAll()
         // Find new objects
         findObjects(map: map, neighbors: neighbors)
         legend.append("и находит следующие возможности:\n")
@@ -314,14 +308,21 @@ class Animal {
     func think(map: Ground, neighbors: Environment) {
         var decide = 0
         var decideLevel = 0
+        if !isActOK {
+            targetObject.interestLevel = 0
+        }
+        // Reduce target level if it is not a danger
+        if targetObject.type != .danger {
+            targetObject.interestLevel /= 4
+        }
         for i in 0..<visibleObjects.count {
             let tileCoord = Coord(col: visibleObjects[i].tile.col, row: visibleObjects[i].tile.row)
             let way = wayLength(target: tileCoord)
             switch visibleObjects[i].type {
             case .food:
-                visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * hungerDemand * 2 - way * way
+                visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * 2 - way * way * way * 2
             case .water:
-                visibleObjects[i].interestLevel = thirstDemand * thirstDemand - way
+                visibleObjects[i].interestLevel = thirstDemand * 2 - way * 3
             case .partner:
                 visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand + age * 2
             case .danger:
@@ -331,15 +332,15 @@ class Animal {
                     targetObject.interestLevel = 0
                     visibleObjects[i].interestLevel = hungerDemand * 2
                 } else {
-                    visibleObjects[i].interestLevel = thirstDemand * hungerDemand - sleepDemand * 2
+                    visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 2 - sleepDemand * 2
                 }
             case .lookLeft:
-                visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand + Int.random(in: 0...10)
+                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...10)
                 if targetObject.type == .lookRight {
                     visibleObjects[i].interestLevel = 0
                 }
             case .lookRight:
-                visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand + Int.random(in: 0...10)
+                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...10)
                 if targetObject.type == .lookLeft {
                     visibleObjects[i].interestLevel = 0
                 }
@@ -499,6 +500,7 @@ class Animal {
                     size += growSize
                 }
             }
+            isActOK = true
         }
     }
     
@@ -531,6 +533,9 @@ class Animal {
     
     /// Find objects
     func findObjects(map: Ground, neighbors: Environment) {
+        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .sleep, description: ""))
+        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookLeft, description: ""))
+        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookRight, description: ""))
         if canForward(map: map) {
             visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward, description: ""))
         }
