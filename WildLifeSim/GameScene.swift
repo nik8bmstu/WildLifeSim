@@ -108,7 +108,7 @@ class GameScene: SKScene {
     // Animal
     var animalLabel = SKLabelNode(text: "Животное:")
     var animalName = SKLabelNode(text: "Имя")
-    var animalSize = SKLabelNode(text: "Среднее(50)")
+    var animalParameters = SKLabelNode(text: "Среднее(50)")
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -242,13 +242,21 @@ class GameScene: SKScene {
                     let type = env.animals[index].isFemale ? env.animals[index].type.labelF : env.animals[index].type.labelM
                     animalName.text = env.animals[index].name
                     animalName.fontColor = color
-                    animalSize.text = type + " - " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
+                    
+                    var parameters = type + " - " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")\n"
+                    parameters.append("Голод: \(env.animals[index].hungerDemand) / \(demandLevelMax)\n")
+                    parameters.append("Жажда: \(env.animals[index].thirstDemand) / \(demandLevelMax)\n")
+                    parameters.append("Бодрость: \(demandLevelMax - env.animals[index].sleepDemand) / \(demandLevelMax)\n")
+                    parameters.append("Настроение: \(env.animals[index].mood)\n")
+                    animalParameters.text = parameters
+                    animalParameters = multipleLineText(labelIn: animalParameters, vOffset: 6)
+                    objInfo.addChild(animalParameters)
+                    
                     objInfo.addChild(animalLabel)
                     objInfo.addChild(animalName)
-                    objInfo.addChild(animalSize)
                     
                     legend.text = env.animals[index].legend
-                    legend = multipleLineText(labelIn: legend)
+                    legend = multipleLineText(labelIn: legend, vOffset: 0)
                     envInfo.addChild(legend)
                 }
             } else {
@@ -498,12 +506,12 @@ class GameScene: SKScene {
         animalName.horizontalAlignmentMode = .left
         
         // Animal size
-        animalSize.fontName = defFontStyle
-        animalSize.fontSize = defFontSize - 5
-        animalSize.fontColor = defFontColor
-        animalSize.name = "animalSize"
-        animalSize.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 8)
-        animalSize.horizontalAlignmentMode = .left
+        animalParameters.fontName = defFontStyle
+        animalParameters.fontSize = defFontSize - 5
+        animalParameters.fontColor = defFontColor
+        animalParameters.name = "animalSize"
+        animalParameters.position = CGPoint(x: tileX, y: tileY - rightVertOffset * 8)
+        animalParameters.horizontalAlignmentMode = .left
     }
     
     /// Settings
@@ -589,7 +597,7 @@ class GameScene: SKScene {
     }
     
     /// Add multiline label
-    func multipleLineText(labelIn: SKLabelNode) -> SKLabelNode {
+    func multipleLineText(labelIn: SKLabelNode, vOffset: Int) -> SKLabelNode {
         let subStrings:[String] = labelIn.text!.components(separatedBy: "\n")
         var labelOut = SKLabelNode()
         var subStringNumber:Int = 0
@@ -601,7 +609,7 @@ class GameScene: SKScene {
             labelTemp.position = labelIn.position
             labelTemp.horizontalAlignmentMode = labelIn.horizontalAlignmentMode
             labelTemp.verticalAlignmentMode = labelIn.verticalAlignmentMode
-            let y:CGFloat = CGFloat(subStringNumber) * labelIn.fontSize
+            let y:CGFloat = CGFloat(subStringNumber) * (labelIn.fontSize + CGFloat(vOffset))
             if subStringNumber == 0 {
                 labelOut = labelTemp
                 subStringNumber += 1

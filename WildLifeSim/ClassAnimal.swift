@@ -108,6 +108,26 @@ enum SizeType: String {
             return 30
         }
     }
+    var sleepGrow: Int {
+        switch self {
+        case .small:
+            return 3
+        case .medium:
+            return 2
+        case .large:
+            return 1
+        }
+    }
+    var growSize: Int {
+        switch self {
+        case .small:
+            return 1
+        case .medium:
+            return 2
+        case .large:
+            return 3
+        }
+    }
     var initSizeMin: Int {
         switch self {
         case .small:
@@ -231,6 +251,8 @@ class Animal {
     var isActOK: Bool = false
     // Last rotation
     var lastRotate: Direction = .right
+    // Настроение
+    var mood: Int = 0
     
     /// Init
     init(map: Ground, myType: Type) {
@@ -309,7 +331,10 @@ class Animal {
         var decide = 0
         var decideLevel = 0
         if !isActOK {
+            mood -= 1
             targetObject.interestLevel = 0
+        } else {
+
         }
         // Reduce target level if it is not a danger
         if targetObject.type != .danger {
@@ -320,13 +345,26 @@ class Animal {
             let way = wayLength(target: tileCoord)
             switch visibleObjects[i].type {
             case .food:
-                visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * 2 - way * way * way * 2
+                if visibleObjects[i].interestLevel == 3 {
+                    mood += 1
+                }
+                if targetObject.type == .food && !isActOK {
+                    visibleObjects[i].interestLevel = 0
+                } else {
+                    visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * 3 - way * way * 3
+                }
             case .water:
-                visibleObjects[i].interestLevel = thirstDemand * 2 - way * 3
+                if targetObject.type == .water && !isActOK {
+                    visibleObjects[i].interestLevel = 0
+                } else {
+                    visibleObjects[i].interestLevel = thirstDemand * 3 - way * 3 - Int.random(in: 0...abs(mood))
+                }
             case .partner:
-                visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand + age * 2
+                visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand + age + mood
+                mood += 1
             case .danger:
                 visibleObjects[i].interestLevel = 100 / way
+                mood -= 10
             case .forward:
                 if targetObject.type == .forward {
                     targetObject.interestLevel = 0
@@ -335,17 +373,17 @@ class Animal {
                     visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 2 - sleepDemand * 2
                 }
             case .lookLeft:
-                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...10)
+                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...abs(mood))
                 if targetObject.type == .lookRight {
                     visibleObjects[i].interestLevel = 0
                 }
             case .lookRight:
-                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...10)
+                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...abs(mood))
                 if targetObject.type == .lookLeft {
                     visibleObjects[i].interestLevel = 0
                 }
             case .sleep:
-                visibleObjects[i].interestLevel = sleepDemand * sleepDemand * 4 - hungerDemand * thirstDemand
+                visibleObjects[i].interestLevel = sleepDemand * 2 - hungerDemand - thirstDemand - Int.random(in: 0...abs(mood))
             default:
                 print("Default switch")
             }
@@ -386,9 +424,10 @@ class Animal {
             isActOK = true
         case .sleep:
             sleep()
+            mood += 1
             isActOK = true
         case .food:
-            if isTileNear(checkCoord: targetObject.tile) {
+            if wayLength(target: targetObject.tile) == 1 {
                 eat(tile: targetObject.tile, map: map)
             } else {
                 print("\(name) need go to food")
@@ -484,47 +523,53 @@ class Animal {
     func eat(tile: Coord, map: Ground) {
         if map.tiles[tile.col][tile.row].foodCount > 0 {
             map.tiles[tile.col][tile.row].foodCount -= 1
-            if hungerDemand > 5 {
+            if hungerDemand > 10 {
                 switch sizeType {
                 case .small:
                     hungerDemand = 0
                 case .medium:
-                    hungerDemand = hungerDemand / 4
+                    hungerDemand -= demandLevelMax / 2
                 case .large:
-                    hungerDemand = hungerDemand / 2
+                    hungerDemand -= demandLevelMax / 3
                 }
             } else {
                 hungerDemand = 0
-                let growSize = 5
-                if size <= (sizeType.sizeMax - growSize) {
-                    size += growSize
+                if size <= (sizeType.sizeMax - sizeType.growSize) {
+                    size += sizeType.growSize
                 }
             }
+            hungerDemand = hungerDemand < 0 ? 0 : hungerDemand
             isActOK = true
+            mood += 1
         }
     }
     
     /// Sleep
     func sleep() {
-        sleepDemand = sleepDemand / 2
+        sleepDemand -= sizeType.sleepGrow * 5
+        sleepDemand = sleepDemand < 0 ? 0 : sleepDemand
     }
     
     /// Grow demands
     func demandsGrow() {
-        if sleepDemand < demandLevelMax {
-            sleepDemand += 1
+        if sleepDemand <= (demandLevelMax - sizeType.sleepGrow) {
+            sleepDemand += sizeType.sleepGrow
         } else {
+            sleepDemand = demandLevelMax
             size -= 1
+            mood -= 1
         }
         if hungerDemand < demandLevelMax {
             hungerDemand += 1
         } else {
             size -= 1
+            mood -= 1
         }
         if thirstDemand < demandLevelMax {
             thirstDemand += 1
         } else {
             size -= 1
+            mood -= 1
         }
         if size < sizeType.sizeMin {
             die()
@@ -660,10 +705,10 @@ class Animal {
         return false
     }
     
-    /// Calculate way length
+    /// Calculate stright way length
     func wayLength(target: Coord) -> Int {
         var actions = 0
-        actions = abs(target.col - coord.col) + abs(target.row - coord.row) // Wrong method, only for first tests!
+        actions = abs(target.col - coord.col) + abs(target.row - coord.row) // Method does not take into account obstacles
         return actions
     }
     
@@ -686,16 +731,6 @@ class Animal {
             }
         }
         return perfectCoord
-    }
-    
-    /// Check if tile is near
-    func isTileNear(checkCoord: Coord) -> Bool {
-        let currentPos = coord.col + coord.row
-        let checkPos = checkCoord.col + checkCoord.row
-        if abs(checkPos - currentPos) == 1 {
-            return true
-        }
-        return false
     }
     
     /// Say hello
