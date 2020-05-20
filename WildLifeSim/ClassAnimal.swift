@@ -8,7 +8,7 @@
 
 import Foundation
 
-let demandLevelMax = 10
+let demandLevelMax = 100
 
 enum Type: String {
     case cow = "cow"
@@ -281,7 +281,7 @@ class Animal {
         visibleObjects.append(targetObject)
         visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookLeft, description: ""))
         visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookRight, description: ""))
-        visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward, description: ""))
+        //visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward, description: ""))
         visibleTiles.append(coord)
         // Take own tile
         placeOnGround(earth: map)
@@ -299,10 +299,10 @@ class Animal {
     func look(map: Ground, neighbors: Environment) {
         legend.append("\"\(name)\" осматривается ")
         // Delete old objects
-        if visibleObjects.count > 4 {
+        if visibleObjects.count > 3 {
             let count = visibleObjects.count
-            for _ in 4..<count {
-                visibleObjects.remove(at: 4)
+            for _ in 3..<count {
+                visibleObjects.remove(at: 3)
             }
         }
         // Find new objects
@@ -319,11 +319,11 @@ class Animal {
             let way = wayLength(target: tileCoord)
             switch visibleObjects[i].type {
             case .food:
-                visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * hungerDemand - way * way
+                visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * hungerDemand * 2 - way * way
             case .water:
-                visibleObjects[i].interestLevel = thirstDemand * thirstDemand - way / 2
+                visibleObjects[i].interestLevel = thirstDemand * thirstDemand - way
             case .partner:
-                visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand + age
+                visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand + age * 2
             case .danger:
                 visibleObjects[i].interestLevel = 100 / way
             case .forward:
@@ -334,21 +334,19 @@ class Animal {
                     visibleObjects[i].interestLevel = thirstDemand * hungerDemand - sleepDemand * 2
                 }
             case .lookLeft:
-                visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand
+                visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand + Int.random(in: 0...10)
                 if targetObject.type == .lookRight {
                     visibleObjects[i].interestLevel = 0
-                } else if lastRotate == .left {
-                    visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand * 2
                 }
             case .lookRight:
-                visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand
+                visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand + Int.random(in: 0...10)
                 if targetObject.type == .lookLeft {
                     visibleObjects[i].interestLevel = 0
-                } else if lastRotate == .right {
-                    visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 3 - sleepDemand * 2
                 }
-            default: // sleep
+            case .sleep:
                 visibleObjects[i].interestLevel = sleepDemand * sleepDemand * 4 - hungerDemand * thirstDemand
+            default:
+                print("Default switch")
             }
             if visibleObjects[i].interestLevel < 0 {
                 visibleObjects[i].interestLevel = 0
@@ -388,10 +386,17 @@ class Animal {
         case .sleep:
             sleep()
             isActOK = true
+        case .food:
+            if isTileNear(checkCoord: targetObject.tile) {
+                eat(tile: targetObject.tile, map: map)
+            } else {
+                print("\(name) need go to food")
+                // Go to food
+            }
         case .forward:
             goForward(map: map)
         default:
-            isActOK = true
+            isActOK = false
         }
         if isActOK {
             legend.append("\"\(name)\" успешно выполнил задуманное\n")
@@ -436,6 +441,30 @@ class Animal {
     /// Go forward
     func goForward(map: Ground) {
         isActOK = false
+        let targetCoord: Coord = forwardCoord()
+        if canForward(map: map) {
+            map.tiles[coord.col][coord.row].isEmpty = true
+            coord = targetCoord
+            map.tiles[coord.col][coord.row].isEmpty = false
+            isActOK = true
+        }
+    }
+    
+    /// Check, can I go forward
+    func canForward(map: Ground) -> Bool {
+        let targetCoord = forwardCoord()
+        let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
+        if isTileExist(coord: targetCoord, limit: limitCoord) {
+            let tile = map.tiles[targetCoord.col][targetCoord.row]
+            if tile.isEmpty && tile.isAcessable {
+                return true
+            }
+        }
+        return false
+    }
+    
+    /// Get Forward tile coord
+    func forwardCoord() -> Coord {
         var targetCoord: Coord = coord
         switch direction {
         case .down:
@@ -447,14 +476,28 @@ class Animal {
         case .left:
             targetCoord.col -= 1
         }
-        let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
-        if isTileExist(coord: targetCoord, limit: limitCoord) {
-            let tile = map.tiles[targetCoord.col][targetCoord.row]
-            if tile.isEmpty && tile.isAcessable {
-                map.tiles[coord.col][coord.row].isEmpty = true
-                coord = targetCoord
-                map.tiles[coord.col][coord.row].isEmpty = false
-                isActOK = true
+        return targetCoord
+    }
+    
+    /// Eat
+    func eat(tile: Coord, map: Ground) {
+        if map.tiles[tile.col][tile.row].foodCount > 0 {
+            map.tiles[tile.col][tile.row].foodCount -= 1
+            if hungerDemand > 5 {
+                switch sizeType {
+                case .small:
+                    hungerDemand = 0
+                case .medium:
+                    hungerDemand = hungerDemand / 4
+                case .large:
+                    hungerDemand = hungerDemand / 2
+                }
+            } else {
+                hungerDemand = 0
+                let growSize = 5
+                if size <= (sizeType.sizeMax - growSize) {
+                    size += growSize
+                }
             }
         }
     }
@@ -464,46 +507,61 @@ class Animal {
         sleepDemand = sleepDemand / 2
     }
     
-    // Stuff functions
-    
     /// Grow demands
     func demandsGrow() {
-        sleepDemand += 1
-        hungerDemand += 1
-        thirstDemand += 1
+        if sleepDemand < demandLevelMax {
+            sleepDemand += 1
+        } else {
+            size -= 1
+        }
+        if hungerDemand < demandLevelMax {
+            hungerDemand += 1
+        } else {
+            size -= 1
+        }
+        if thirstDemand < demandLevelMax {
+            thirstDemand += 1
+        } else {
+            size -= 1
+        }
+        if size < sizeType.sizeMin {
+            die()
+        }
     }
     
     /// Find objects
     func findObjects(map: Ground, neighbors: Environment) {
+        if canForward(map: map) {
+            visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward, description: ""))
+        }
         defineVisibleTiles(map: map)
         // 0 is animal position, so i from 1
         for i in 1..<visibleTiles.count {
             let currentCoord = Coord(col: visibleTiles[i].col, row: visibleTiles[i].row)
             let tile = map.tiles[currentCoord.col][currentCoord.row]
             if (tile.foodCount > 0) && !isPredator {
-                let object = visibleObject(tile: currentCoord, interestLevel: tile.foodCount, type: .food, description: "")
-                visibleObjects.append(object)
+                visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: tile.foodCount, type: .food, description: ""))
             }
             if tile.waterHere {
-                let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .water, description: "")
-                visibleObjects.append(object)
+                visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: 0, type: .water, description: ""))
             }
             if !tile.isEmpty {
                 let index = neighbors.getAnimalIndex(coord: currentCoord)
-                // If it alive
-                if neighbors.animals[index].isAlive {
-                    // I i am not a predator
-                    if !isPredator {
-                        // If it is a predator and bigger than me
-                        if (neighbors.animals[index].isPredator && neighbors.animals[index].size > size) {
-                            let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .danger, description: "")
-                            visibleObjects.append(object)
-                        } else if ((neighbors.animals[index].isFemale != isFemale) && (neighbors.animals[index].type == type)) {
-                            // Same type, but another gender
-                            if (!neighbors.animals[index].isPregnant && !isPregnant) {
-                                // No one is pregnant
-                                let object = visibleObject(tile: currentCoord, interestLevel: 0, type: .partner, description: "")
-                                visibleObjects.append(object)
+                // if animal not dead
+                if index >= 0 {
+                    // If it alive
+                    if neighbors.animals[index].isAlive {
+                        // I i am not a predator
+                        if !isPredator {
+                            // If it is a predator and bigger than me
+                            if (neighbors.animals[index].isPredator && neighbors.animals[index].size > size) {
+                                visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: 0, type: .danger, description: ""))
+                            } else if ((neighbors.animals[index].isFemale != isFemale) && (neighbors.animals[index].type == type)) {
+                                // Same type, but another gender
+                                if (!neighbors.animals[index].isPregnant && !isPregnant) {
+                                    // No one is pregnant
+                                    visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: 0, type: .partner, description: ""))
+                                }
                             }
                         }
                     }
@@ -625,6 +683,16 @@ class Animal {
         return perfectCoord
     }
     
+    /// Check if tile is near
+    func isTileNear(checkCoord: Coord) -> Bool {
+        let currentPos = coord.col + coord.row
+        let checkPos = checkCoord.col + checkCoord.row
+        if abs(checkPos - currentPos) == 1 {
+            return true
+        }
+        return false
+    }
+    
     /// Say hello
     func sayHello() -> String {
         let typeLabel = isFemale ? type.labelF : type.labelM
@@ -645,6 +713,6 @@ class Animal {
     /// Die
     func die() {
         isAlive = false
-        print("DIED")
+        print("\(name) DIED")
     }
 }

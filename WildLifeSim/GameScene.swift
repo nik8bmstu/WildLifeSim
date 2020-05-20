@@ -13,6 +13,7 @@ import GameplayKit
 
 class GameScene: SKScene {
     var animalId = 0
+    var isFollow = false
     
     var map = SKNode()
     var foodMap = SKNode()
@@ -143,11 +144,13 @@ class GameScene: SKScene {
     }
     
     func follow(env: Environment){
-        for i in 0..<env.animalCount {
-            if env.animals[i].uniqueID == animalId {
-                tapColumn = env.animals[i].coord.col
-                tapRow = env.animals[i].coord.row
-                break
+        if isFollow {
+            for i in 0..<env.animalCount {
+                if env.animals[i].uniqueID == animalId {
+                    tapColumn = env.animals[i].coord.col
+                    tapRow = env.animals[i].coord.row
+                    break
+                }
             }
         }
     }
@@ -234,18 +237,20 @@ class GameScene: SKScene {
             if curTile.meatCount == 0 {
                 let coord = Coord(col: tapColumn, row: tapRow)
                 let index = env.getAnimalIndex(coord: coord)
-                let color = env.animals[index].isFemale ? SKColor.systemPink : SKColor.systemBlue
-                let type = env.animals[index].isFemale ? env.animals[index].type.labelF : env.animals[index].type.labelM
-                animalName.text = env.animals[index].name
-                animalName.fontColor = color
-                animalSize.text = type + " - " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
-                objInfo.addChild(animalLabel)
-                objInfo.addChild(animalName)
-                objInfo.addChild(animalSize)
-                
-                legend.text = env.animals[index].legend
-                legend = multipleLineText(labelIn: legend)
-                envInfo.addChild(legend)
+                if index >= 0 {
+                    let color = env.animals[index].isFemale ? SKColor.systemPink : SKColor.systemBlue
+                    let type = env.animals[index].isFemale ? env.animals[index].type.labelF : env.animals[index].type.labelM
+                    animalName.text = env.animals[index].name
+                    animalName.fontColor = color
+                    animalSize.text = type + " - " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")"
+                    objInfo.addChild(animalLabel)
+                    objInfo.addChild(animalName)
+                    objInfo.addChild(animalSize)
+                    
+                    legend.text = env.animals[index].legend
+                    legend = multipleLineText(labelIn: legend)
+                    envInfo.addChild(legend)
+                }
             } else {
                 
             }
@@ -278,6 +283,7 @@ class GameScene: SKScene {
     
     /// Draw food  map
     func drawFood(earth: Ground) {
+        foodLayer.fill(with: emptyTile)
         foodMap.removeAllChildren()
         // Fill map from earth
         for column in 0..<earth.sizeHorizontal {
@@ -551,7 +557,12 @@ class GameScene: SKScene {
         tapRow = layer.tileRowIndex(fromPosition: pointResized)
         if !earth.tiles[tapColumn][tapRow].isEmpty && earth.tiles[tapColumn][tapRow].meatCount == 0 {
             let index = env.getAnimalIndex(coord: Coord(col: tapColumn, row: tapRow))
-            animalId = env.animals[index].uniqueID
+            if index >= 0 {
+                isFollow = true
+                animalId = env.animals[index].uniqueID
+            }
+        } else {
+            isFollow = false
         }
         
         //print("Map tapped at Column: \(tapColumn) Row: \(tapRow)")

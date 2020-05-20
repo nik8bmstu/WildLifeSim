@@ -37,12 +37,11 @@ class Environment {
             animals[i].demandsGrow()
             animals[i].look(map: earth, neighbors: self)
             animals[i].think(map: earth, neighbors: self)
-            
+            if !animals[i].isAlive {
+            deadAnimals += 1
+            }
             if hour == 0 {
                 animals[i].birthday()
-                if !animals[i].isAlive {
-                    deadAnimals += 1
-                }
             }
         }
         while deadAnimals > 0 {
