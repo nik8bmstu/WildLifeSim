@@ -168,6 +168,16 @@ enum SizeType: String {
             return 150
         }
     }
+    var description: String {
+        switch self {
+        case .small:
+            return "Маленькое"
+        case .medium:
+            return "Среднее"
+        case .large:
+            return "Большое"
+        }
+    }
 }
 
 enum Direction: Int {
@@ -296,6 +306,10 @@ class Animal {
         default:
             direction = .right
         }
+        // Randomize demands
+        sleepDemand = Int.random(in: 0...30)
+        hungerDemand = Int.random(in: 10...40)
+        thirstDemand = Int.random(in: 0...25)
         // Get coord
         coord = startCoordRandomize(map: map)
         // Define target and visible tiles
@@ -351,7 +365,7 @@ class Animal {
                 if targetObject.type == .food && !isActOK {
                     visibleObjects[i].interestLevel = 0
                 } else {
-                    visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * 3 - way * way * 3
+                    visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * 3 - way * way * 3 + (sizeType.sizeMax - size)
                 }
             case .water:
                 if targetObject.type == .water && !isActOK {
@@ -360,7 +374,12 @@ class Animal {
                     visibleObjects[i].interestLevel = thirstDemand * 3 - way * 3 - Int.random(in: 0...abs(mood))
                 }
             case .partner:
-                visibleObjects[i].interestLevel = way * 10 - thirstDemand - hungerDemand - sleepDemand + age + mood
+                if !isPregnant {
+                    visibleObjects[i].interestLevel = 20 / way - thirstDemand - hungerDemand - sleepDemand + age + mood
+                    mood += 1
+                } else {
+                    visibleObjects[i].interestLevel = 0
+                }
                 mood += 1
             case .danger:
                 visibleObjects[i].interestLevel = 100 / way
@@ -368,22 +387,24 @@ class Animal {
             case .forward:
                 if targetObject.type == .forward {
                     targetObject.interestLevel = 0
-                    visibleObjects[i].interestLevel = hungerDemand * 2
-                } else {
-                    visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 2 - sleepDemand * 2
+                    if canForward(map: map) {
+                        visibleObjects[i].interestLevel = hungerDemand * 2 - sleepDemand * 2 - Int.random(in: 0...10)
+                    }
+                } else if canForward(map: map) {
+                    visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 2 - sleepDemand * 3  + Int.random(in: 0...10)
                 }
             case .lookLeft:
-                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...abs(mood))
+                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...10)
                 if targetObject.type == .lookRight {
                     visibleObjects[i].interestLevel = 0
                 }
             case .lookRight:
-                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...abs(mood))
+                visibleObjects[i].interestLevel = thirstDemand + hungerDemand - sleepDemand + Int.random(in: 0...10)
                 if targetObject.type == .lookLeft {
                     visibleObjects[i].interestLevel = 0
                 }
             case .sleep:
-                visibleObjects[i].interestLevel = sleepDemand * 2 - hungerDemand - thirstDemand - Int.random(in: 0...abs(mood))
+                visibleObjects[i].interestLevel = sleepDemand * 4 - hungerDemand - thirstDemand - Int.random(in: 0...abs(mood))
             default:
                 print("Default switch")
             }
@@ -430,11 +451,22 @@ class Animal {
             if wayLength(target: targetObject.tile) == 1 {
                 eat(tile: targetObject.tile, map: map)
             } else {
-                print("\(name) need go to food")
-                // Go to food
+                findWay(tile: targetObject.tile, map: map)
+            }
+        case .water:
+            if wayLength(target: targetObject.tile) == 1 {
+                drink(tile: targetObject.tile, map: map)
+            } else {
+                findWay(tile: targetObject.tile, map: map)
             }
         case .forward:
             goForward(map: map)
+        case .partner:
+            if wayLength(target: targetObject.tile) == 1 {
+                continueLine()
+            } else {
+                findWay(tile: targetObject.tile, map: map)
+            }
         default:
             isActOK = false
         }
@@ -447,6 +479,19 @@ class Animal {
     }
     
     // Actions
+    
+    /// Find way - MOST important func... but not now
+    func findWay(tile: Coord, map: Ground) {
+        goForward(map: map)
+        if !isActOK {
+            switch Int.random(in: 0...1) {
+            case 0:
+                rotateLeft()
+            default:
+                rotateRight()
+            }
+        }
+    }
     
     /// Rotate left
     func rotateLeft() {
@@ -544,10 +589,39 @@ class Animal {
         }
     }
     
+    /// Eat
+    func drink(tile: Coord, map: Ground) {
+        if map.tiles[tile.col][tile.row].waterHere {
+            switch sizeType {
+            case .small:
+                thirstDemand -= demandLevelMax / 3
+            case .medium:
+                thirstDemand -= demandLevelMax / 2
+            case .large:
+                thirstDemand = 0
+            }
+            thirstDemand = thirstDemand < 0 ? 0 : thirstDemand
+            isActOK = true
+            mood += 1
+        }
+    }
+    
     /// Sleep
     func sleep() {
-        sleepDemand -= sizeType.sleepGrow * 5
+        sleepDemand -= sizeType.sleepGrow * 6
         sleepDemand = sleepDemand < 0 ? 0 : sleepDemand
+    }
+    
+    /// Continue the line
+    func continueLine() {
+        if isFemale {
+            isPregnant = true
+            legend.append("\"\(name)\" беременна\n")
+        } else {
+            
+        }
+        isActOK = true
+        mood += 10
     }
     
     /// Grow demands

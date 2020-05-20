@@ -243,7 +243,8 @@ class GameScene: SKScene {
                     animalName.text = env.animals[index].name
                     animalName.fontColor = color
                     
-                    var parameters = type + " - " + env.animals[index].sizeType.rawValue + "(" + String(env.animals[index].size) + ")\n"
+                    var parameters = type + " (" + env.animals[index].sizeType.description + ")\n"
+                    parameters.append("Вес: (\(env.animals[index].sizeType.sizeMin)) <= \(env.animals[index].size) => (\(env.animals[index].sizeType.sizeMax))\n")
                     parameters.append("Голод: \(env.animals[index].hungerDemand) / \(demandLevelMax)\n")
                     parameters.append("Жажда: \(env.animals[index].thirstDemand) / \(demandLevelMax)\n")
                     parameters.append("Бодрость: \(demandLevelMax - env.animals[index].sleepDemand) / \(demandLevelMax)\n")
