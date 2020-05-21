@@ -38,7 +38,16 @@ class Environment {
             animals[i].look(map: earth, neighbors: self)
             animals[i].think(map: earth, neighbors: self)
             if !animals[i].isAlive {
-            deadAnimals += 1
+                deadAnimals += 1
+            }
+            if animals[i].isPregnant {
+                animals[i].pregnantTime += 1
+                if animals[i].pregnantTime >= animals[i].sizeType.pregnantTime {
+                    let birthTileCoord = animals[i].giveBirth(map: earth)
+                    if birthTileCoord.col != -1 {
+                        newAnimalBirth(birthTile: birthTileCoord, parent: animals[i])
+                    }
+                }
             }
             if hour == 0 {
                 animals[i].birthday()
@@ -59,13 +68,14 @@ class Environment {
     
     /// Init start animal pool
     func animalsInit() {
+        let randomPlace = Coord(col: -1, row: -1)
         // Place animals
         for _ in 0...1 {
-            animals.append(Animal(map: earth, myType: .sheep))
-            animals.append(Animal(map: earth, myType: .cow))
-            animals.append(Animal(map: earth, myType: .horse))
-            animals.append(Animal(map: earth, myType: .goat))
-            animals.append(Animal(map: earth, myType: .chicken))
+            animals.append(Animal(map: earth, place: randomPlace, myType: .sheep))
+            animals.append(Animal(map: earth, place: randomPlace, myType: .cow))
+            animals.append(Animal(map: earth, place: randomPlace, myType: .horse))
+            animals.append(Animal(map: earth, place: randomPlace, myType: .goat))
+            animals.append(Animal(map: earth, place: randomPlace, myType: .chicken))
         }
         animalCount = animals.count
         totalAnimalCount = animalCount
@@ -74,7 +84,15 @@ class Environment {
         }
     }
     
-    
+    /// New animal birth
+    func newAnimalBirth(birthTile: Coord, parent: Animal) {
+        let newAnimal = Animal(map: earth, place: birthTile, myType: parent.type)
+        newAnimal.defineVisibleTiles(map: earth)
+        newAnimal.generation = parent.generation + 1
+        animals.append(newAnimal)
+        animalCount = animals.count
+        totalAnimalCount += 1
+    }
     
     /// Return animal index by coord
     func getAnimalIndex(coord: Coord) -> Int {

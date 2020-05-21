@@ -108,6 +108,16 @@ enum SizeType: String {
             return 30
         }
     }
+    var pregnantTime: Int {
+        switch self {
+        case .small:
+            return 15
+        case .medium:
+            return 30
+        case .large:
+            return 45
+        }
+    }
     var sleepGrow: Int {
         switch self {
         case .small:
@@ -237,6 +247,7 @@ class Animal {
     // Возраст
     var age: Int = 0
     var isAlive: Bool = true
+    var generation: Int = 1
     // Нужды
     var hungerDemand: Int = 5
     var thirstDemand: Int = 2
@@ -247,6 +258,7 @@ class Animal {
     // Пол
     var isFemale: Bool
     var isPregnant: Bool = false
+    var pregnantTime: Int = 0
     // Очки действий
     var actionPoints: Int = 6
     // Видимые объекты
@@ -265,7 +277,7 @@ class Animal {
     var mood: Int = 0
     
     /// Init
-    init(map: Ground, myType: Type) {
+    init(map: Ground, place: Coord, myType: Type) {
         // Get type
         type = myType
         // Get food type
@@ -311,7 +323,11 @@ class Animal {
         hungerDemand = Int.random(in: 10...40)
         thirstDemand = Int.random(in: 0...25)
         // Get coord
-        coord = startCoordRandomize(map: map)
+        if place.col != -1 {
+            coord = place
+        } else {
+            coord = startCoordRandomize(map: map)
+        }
         // Define target and visible tiles
         targetObject = visibleObject(tile: coord, interestLevel: 0, type: .sleep, description: "")
         visibleObjects.append(targetObject)
@@ -683,8 +699,11 @@ class Animal {
                             } else if ((neighbors.animals[index].isFemale != isFemale) && (neighbors.animals[index].type == type)) {
                                 // Same type, but another gender
                                 if (!neighbors.animals[index].isPregnant && !isPregnant) {
-                                    // No one is pregnant
-                                    visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: 0, type: .partner, description: ""))
+                                    // Both is not pregnant
+                                    if (neighbors.animals[index].age > (sizeType.lifeTime / 5) && age > (sizeType.lifeTime / 5)) {
+                                        // Both is adult
+                                        visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: 0, type: .partner, description: ""))
+                                    }
                                 }
                             }
                         }
@@ -701,14 +720,6 @@ class Animal {
         visibleTiles.append(coord)
         defineVisibleTilesAround(map: map)
         defineVisibleTilesForward(map: map)
-        /*var visibleTilesString = "\"\(name)\" видит следующие клетки: "
-        visibleTilesString.append("\(transformCoord(col: visibleTiles[0].col, row: visibleTiles[0].row))")
-        if visibleTiles.count > 1 {
-            for i in 1..<visibleTiles.count {
-                visibleTilesString.append(", \(transformCoord(col: visibleTiles[i].col, row: visibleTiles[i].row))")
-            }
-        }
-        print(visibleTilesString)*/
     }
     
     /// Define visible tiles around
@@ -822,6 +833,42 @@ class Animal {
         if chanceDie > sizeType.lifeTime {
             die()
         }
+    }
+    
+    /// Birth
+    func giveBirth(map: Ground) -> Coord {
+        let birthTile = findEmptyTile(map: map)
+        if birthTile.col != -1 {
+            isPregnant = false
+            pregnantTime = 0
+            legend.append("\"\(name)\" родила детеныша\n")
+            return birthTile
+        }
+        return Coord(col: -1, row: -1)
+    }
+    
+    /// Find empty tile near me
+    func findEmptyTile(map: Ground) -> Coord {
+        let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
+        var checkTileCoord = coord
+        var checkArray: [Coord] = []
+        checkTileCoord.col += 1
+        checkArray.append(checkTileCoord)
+        checkTileCoord.col -= 2
+        checkArray.append(checkTileCoord)
+        checkTileCoord.col += 1
+        checkTileCoord.row += 1
+        checkArray.append(checkTileCoord)
+        checkTileCoord.row -= 2
+        checkArray.append(checkTileCoord)
+        for i in 0...3 {
+            if isTileExist(coord: checkArray[i], limit: limitCoord) {
+                if map.tiles[checkArray[i].col][checkArray[i].row].isEmpty && map.tiles[checkArray[i].col][checkArray[i].row].isAcessable {
+                    return checkArray[i]
+                }
+            }
+        }
+        return Coord(col: -1, row: -1)
     }
     
     /// Die
