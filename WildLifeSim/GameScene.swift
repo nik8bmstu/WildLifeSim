@@ -9,12 +9,11 @@
 import SpriteKit
 import GameplayKit
 
-
-
 class GameScene: SKScene {
     var animalId = 0
     var isFollow = false
     
+    let mapScale: CGFloat = 0.4
     var map = SKNode()
     var foodMap = SKNode()
     var envInfo = SKNode()
@@ -49,7 +48,6 @@ class GameScene: SKScene {
     
     // Connect Ground Tile set
     var tileSet = SKTileSet(named: "groundsSet")
-    //var tileSize: CGSize = CGSize(width: earth.sizeTile, height: earth.sizeTile)
     var tileSize: CGSize = CGSize(width: 90, height: 90)
     var backgroundTiles: SKTileGroup!
     var grassTiles: SKTileGroup!
@@ -116,7 +114,12 @@ class GameScene: SKScene {
 
     override init(size: CGSize) {
         super.init(size: size)
-        self.anchorPoint = CGPoint(x:0.41, y:0.627)
+        //self.anchorPoint = CGPoint(x:0.41, y:0.627)
+        let xOffset: CGFloat = 500.0
+        let mapH: CGFloat = CGFloat(earth.sizeHorizontal) * mapScale * 90.0 / 2
+        let xPoint: CGFloat = ((xOffset + mapH) / size.width)
+        print("Anchor Point x = \(xPoint)")
+        self.anchorPoint = CGPoint(x: xPoint, y:0.5)
     }
     
     /// First call func
@@ -521,12 +524,12 @@ class GameScene: SKScene {
         self.backgroundColor = SKColor.white
         // Create map
         addChild(map)
-        map.xScale = 0.4
-        map.yScale = 0.4
+        map.xScale = mapScale
+        map.yScale = mapScale
         // Create food map
         addChild(foodMap)
-        foodMap.xScale = 0.4
-        foodMap.yScale = 0.4
+        foodMap.xScale = mapScale
+        foodMap.yScale = mapScale
         // Create environment info labels
         addChild(envInfo)
         envInfo.xScale = 1
@@ -541,16 +544,33 @@ class GameScene: SKScene {
         objInfo.yScale = 1
         // Create animal
         addChild(animalsMap)
-        animalsMap.xScale = 0.4
-        animalsMap.yScale = 0.4
+        animalsMap.xScale = mapScale
+        animalsMap.yScale = mapScale
         // Create frame
         addChild(selectFrame)
-        selectFrame.xScale = 0.4
-        selectFrame.yScale = 0.4
+        selectFrame.xScale = mapScale
+        selectFrame.yScale = mapScale
         // Create Step button
         button = SKSpriteNode(color: SKColor.red, size: CGSize(width: 150, height: 50))
         button.position = CGPoint(x: statusX, y:statusY + 9)
         addChild(button)
+        
+        addStuffInfo(scene: self)
+    }
+    
+    // Add stuff info
+    func addStuffInfo(scene: SKScene) {
+        // Add Anchor point
+        let anchorPV = SKSpriteNode(color: SKColor.green, size: CGSize(width: 2, height: 40))
+        anchorPV.position = CGPoint(x: 0, y:0)
+        addChild(anchorPV)
+        let anchorPH = SKSpriteNode(color: SKColor.green, size: CGSize(width: 40, height: 2))
+        anchorPH.position = CGPoint(x: 0, y:0)
+        addChild(anchorPH)
+        // Add Left map point
+        let leftMapPoint = SKSpriteNode(color: SKColor.blue, size: CGSize(width: 5, height: 50))
+        leftMapPoint.position = CGPoint(x: (-CGFloat(earth.sizeHorizontal) * 90 * mapScale / 2), y:0)
+        addChild(leftMapPoint)
     }
     
     /// Step button tap function
@@ -581,7 +601,7 @@ class GameScene: SKScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first
         let touchLocation = touch!.location(in: self)
-        //print(touchLocation)
+        print(touchLocation)
         // Check location of the touch
         if button.contains(touchLocation) {
             stepButtonTapped()

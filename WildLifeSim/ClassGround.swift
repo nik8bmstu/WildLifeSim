@@ -39,7 +39,7 @@ enum TileType: String {
 class Ground {
     var sizeHorizontal: Int = 20
     var sizeVertical: Int = 20
-    var sizeTile: Int = 20
+    var sizeTile: Int = 90
     var tiles: [[Tile]] = []
     var initFoodCount: Int = 0
     

@@ -13,7 +13,8 @@ import GameplayKit
 // Ground class code
 let countColumns = 30
 let countRows = 20
-let sizeTile = 90
+let macCountColumns = 60
+let macCountRows = 26
 let earth = Ground()
 let env = Environment()
 
@@ -33,7 +34,13 @@ class GameViewController: UIViewController {
         // Ground init
         earth.sizeHorizontal = countColumns
         earth.sizeVertical = countRows
-        earth.sizeTile = sizeTile
+        
+        #if targetEnvironment(macCatalyst)
+        // Code for Mac.
+        earth.sizeHorizontal = macCountColumns
+        earth.sizeVertical = macCountRows
+        #endif
+        
         earth.initTiles()
         // Env init
         env.foodCount = earth.initFoodCount
