@@ -35,6 +35,7 @@
 		244C2F1D246DC5AA0085E1BB /* ClassGround.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassGround.swift; sourceTree = "<group>"; };
 		244D07EC246E058500003CC7 /* GroundTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GroundTileSet.sks; sourceTree = "<group>"; };
 		244D07EE246E10EC00003CC7 /* FoodTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = FoodTileSet.sks; sourceTree = "<group>"; };
+		245651412476B13800E863CB /* WildLifeSim.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WildLifeSim.entitlements; sourceTree = "<group>"; };
 		246351EE246EE615009B3C34 /* MainLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainLogic.swift; sourceTree = "<group>"; };
 		246351F024701894009B3C34 /* ClassAnimal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassAnimal.swift; sourceTree = "<group>"; };
 		246351F424703C7E009B3C34 /* AnimalTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = AnimalTileSet.sks; sourceTree = "<group>"; };
@@ -70,6 +71,7 @@
 		244C2F04246D95060085E1BB /* WildLifeSim */ = {
 			isa = PBXGroup;
 			children = (
+				245651412476B13800E863CB /* WildLifeSim.entitlements */,
 				244C2F05246D95060085E1BB /* AppDelegate.swift */,
 				244C2F09246D95060085E1BB /* Actions.sks */,
 				244C2F0B246D95060085E1BB /* GameScene.swift */,
@@ -312,6 +314,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = WildLifeSim/WildLifeSim.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = S4KU5RWMKT;
 				INFOPLIST_FILE = WildLifeSim/Info.plist;
@@ -322,6 +325,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "nik-bmstu.WildLifeSim";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -331,6 +335,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = WildLifeSim/WildLifeSim.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = S4KU5RWMKT;
 				INFOPLIST_FILE = WildLifeSim/Info.plist;
@@ -341,6 +346,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "nik-bmstu.WildLifeSim";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
