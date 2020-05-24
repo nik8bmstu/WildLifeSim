@@ -11,10 +11,15 @@ import SpriteKit
 import GameplayKit
 
 // Ground class code
-let countColumns = 30
-let countRows = 20
+let iPadCountColumns = 30
+let iPadCountRows = 20
+
 let macCountColumns = 60
 let macCountRows = 26
+
+let iPhoneCountColumns = 15
+let iPhoneCountRows = 6
+
 let earth = Ground()
 let env = Environment()
 
@@ -22,6 +27,29 @@ class GameViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        // Ground init
+        earth.sizeHorizontal = iPadCountColumns
+        earth.sizeVertical = iPadCountRows
+        
+        #if targetEnvironment(macCatalyst)
+        // Code for Mac.
+        earth.sizeHorizontal = macCountColumns
+        earth.sizeVertical = macCountRows
+        #endif
+        
+        if view.bounds.size.height == 375 {
+            // Iphone 11 Pro
+            earth.sizeHorizontal = iPhoneCountColumns
+            earth.sizeVertical = iPhoneCountRows
+        }
+        
+        earth.initTiles()
+        // Env init
+        env.foodCount = earth.initFoodCount
+        env.animalsInit()
+        
         // Scene init
         let scene = GameScene(size: view.bounds.size)
         let skView = view as! SKView
@@ -30,21 +58,6 @@ class GameViewController: UIViewController {
         skView.showsNodeCount = true
         skView.ignoresSiblingOrder = true
         scene.scaleMode = .resizeFill
-        
-        // Ground init
-        earth.sizeHorizontal = countColumns
-        earth.sizeVertical = countRows
-        
-        #if targetEnvironment(macCatalyst)
-        // Code for Mac.
-        earth.sizeHorizontal = macCountColumns
-        earth.sizeVertical = macCountRows
-        #endif
-        
-        earth.initTiles()
-        // Env init
-        env.foodCount = earth.initFoodCount
-        env.animalsInit()
         
         // Enable scene
         skView.presentScene(scene)

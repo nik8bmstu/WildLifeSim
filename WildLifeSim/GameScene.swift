@@ -24,24 +24,24 @@ class GameScene: SKScene {
     var button = SKNode()
     
     let defFontStyle = "American Typewriter"
-    let defFontSize: CGFloat = 25
+    var defFontSize: CGFloat = 25
     let defFontColor = SKColor.black
-    let fontTypeAttribute = [ NSAttributedString.Key.font: UIFont.init(name: "American Typewriter", size: 25)]
     let blackAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.black ]
     let greenAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.green ]
     let redAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.red ]
 
-    let statusY: CGFloat = -415
-    let statusX: CGFloat = -465
+    // Anchor points of interface elements
+    var statusY: CGFloat = -415
+    var statusX: CGFloat = -465
 
-    let tileX: CGFloat = 550
-    let tileY: CGFloat = 330
+    var tileX: CGFloat = 550
+    var tileY: CGFloat = 330
     
-    let axisHX: CGFloat = -522
-    let axisHY: CGFloat = 363
+    var axisHX: CGFloat = -522
+    var axisHY: CGFloat = 363
     
-    let axisVX: CGFloat = -550
-    let axisVY: CGFloat = 335
+    var axisVX: CGFloat = -550
+    var axisVY: CGFloat = 335
 
     var tapColumn = 0
     var tapRow = 0
@@ -115,11 +115,41 @@ class GameScene: SKScene {
     override init(size: CGSize) {
         super.init(size: size)
         //self.anchorPoint = CGPoint(x:0.41, y:0.627)
-        let xOffset: CGFloat = 500.0
-        let mapH: CGFloat = CGFloat(earth.sizeHorizontal) * mapScale * 90.0 / 2
-        let xPoint: CGFloat = ((xOffset + mapH) / size.width)
-        print("Anchor Point x = \(xPoint)")
-        self.anchorPoint = CGPoint(x: xPoint, y:0.5)
+        let offsetX: CGFloat = 20.0
+        var topPanelSize: CGFloat = 0.0
+        #if targetEnvironment(macCatalyst)
+        // Code for Mac.
+        topPanelSize = 30.0
+        #endif
+        // Calculate center point of map as 0 point
+        let offsetY: CGFloat = offsetX + topPanelSize
+        let mapX: CGFloat = CGFloat(earth.sizeHorizontal) * mapScale * 90.0 / 2
+        let xPoint: CGFloat = ((offsetX + mapX) / size.width)
+        let mapY: CGFloat = CGFloat(earth.sizeVertical) * mapScale * 90.0 / 2
+        let yPoint: CGFloat = ((size.height - offsetY - mapY) / size.height)
+        self.anchorPoint = CGPoint(x: xPoint, y: yPoint)
+        
+        // Calculate Interface size
+        if size.height == 375 {
+            // Iphone 11 Pro
+            defFontSize = 20
+        }
+        
+        // Calculate anchor points of interface elements
+        statusY = -mapY - 40
+        statusX = -mapX + 75
+
+        tileX = mapX + defFontSize / 2
+        tileY = mapY - defFontSize
+        
+        axisHX = -mapX + mapScale * 90.0 / 2
+        axisHY = mapY + 2
+        
+        axisVX = -mapX - 10//-550
+        axisVY = mapY - mapScale * 90.0 / 2 - 7
+        
+        
+        
     }
     
     /// First call func
@@ -172,6 +202,7 @@ class GameScene: SKScene {
         let fullRange = NSRange(location: 0, length: animalsCount.count)
         let herbivorousRange = NSRange(location: 10, length: herbivorousCount.count)
         let predatorRange = NSRange(location: 13 + herbivorousCount.count, length: predatorCount.count)
+        let fontTypeAttribute = [ NSAttributedString.Key.font: UIFont.init(name: "American Typewriter", size: defFontSize)]
         let fullCount = NSMutableAttributedString(string: animalsCount, attributes: fontTypeAttribute as [NSAttributedString.Key : Any])
         fullCount.addAttributes(blackAttribute, range: fullRange)
         fullCount.addAttributes(greenAttribute, range: herbivorousRange)
@@ -416,7 +447,7 @@ class GameScene: SKScene {
         day.fontSize = defFontSize
         day.fontColor = defFontColor
         day.name = "day"
-        day.position = CGPoint(x: statusX + 100, y: statusY)
+        day.position = CGPoint(x: statusX + defFontSize * 4, y: statusY)
         day.horizontalAlignmentMode = .left
         
         // Status Time
@@ -424,7 +455,7 @@ class GameScene: SKScene {
         time.fontSize = defFontSize
         time.fontColor = defFontColor
         time.name = "time"
-        time.position = CGPoint(x: statusX + 230, y: statusY)
+        time.position = CGPoint(x: statusX + defFontSize * 9, y: statusY)
         time.horizontalAlignmentMode = .left
         
         // Status Total food
@@ -432,7 +463,7 @@ class GameScene: SKScene {
         food.fontSize = defFontSize
         food.fontColor = defFontColor
         food.name = "food"
-        food.position = CGPoint(x: statusX + 430, y: statusY)
+        food.position = CGPoint(x: statusX + defFontSize * 16, y: statusY)
         food.horizontalAlignmentMode = .left
         
         // Animals count
@@ -440,7 +471,7 @@ class GameScene: SKScene {
         animals.fontSize = defFontSize
         animals.fontColor = defFontColor
         animals.name = "animals"
-        animals.position = CGPoint(x: statusX + 570, y: statusY)
+        animals.position = CGPoint(x: statusX + defFontSize * 21, y: statusY)
         animals.horizontalAlignmentMode = .left
         
         // Animal's legend
@@ -448,7 +479,7 @@ class GameScene: SKScene {
         legend.fontSize = defFontSize - 7
         legend.fontColor = SKColor.darkGray
         legend.name = "legend"
-        legend.position = CGPoint(x: statusX - 75, y: statusY - 50)
+        legend.position = CGPoint(x: statusX - 75, y: statusY - ((defFontSize - 7) * 2))
         legend.horizontalAlignmentMode = .left
         
         // Tile coord
@@ -459,7 +490,7 @@ class GameScene: SKScene {
         tileLabel.position = CGPoint(x: tileX, y: tileY)
         tileLabel.horizontalAlignmentMode = .left
         
-        let rightVertOffset: CGFloat = 30
+        let rightVertOffset: CGFloat = defFontSize
         
         // Tile Type
         tileType.fontName = defFontStyle
@@ -555,7 +586,7 @@ class GameScene: SKScene {
         button.position = CGPoint(x: statusX, y:statusY + 9)
         addChild(button)
         
-        addStuffInfo(scene: self)
+        //addStuffInfo(scene: self)
     }
     
     // Add stuff info
@@ -571,6 +602,10 @@ class GameScene: SKScene {
         let leftMapPoint = SKSpriteNode(color: SKColor.blue, size: CGSize(width: 5, height: 50))
         leftMapPoint.position = CGPoint(x: (-CGFloat(earth.sizeHorizontal) * 90 * mapScale / 2), y:0)
         addChild(leftMapPoint)
+        // Add Top map point
+        let topMapPoint = SKSpriteNode(color: SKColor.blue, size: CGSize(width: 50, height: 5))
+        topMapPoint.position = CGPoint(x: 0, y: (CGFloat(earth.sizeVertical) * 90 * mapScale / 2))
+        addChild(topMapPoint)
     }
     
     /// Step button tap function
