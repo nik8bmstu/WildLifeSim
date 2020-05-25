@@ -11,13 +11,24 @@ import Foundation
 let demandLevelMax = 100
 
 enum Type: String {
+    // // herb
+    // small
+    case chicken = "chicken"
+    // mid
     case cow = "cow"
     case horse = "horse"
-    case elephant = "elephant"
+    case pig = "pig"
     case sheep = "sheep"
     case goat = "goat"
-    case tiger = "tiger"
-    case chicken = "chicken"
+    // big
+    case buffalo = "buffalo"
+    // // predator
+    // small
+    // mid
+    // big
+    case hippo = "hippo"
+    
+    static var allCases: [Type] = [.cow, .horse, .pig, .sheep, .goat, .hippo, .chicken, .buffalo]
     
     var labelF: String {
         switch self {
@@ -25,16 +36,18 @@ enum Type: String {
             return "Корова"
         case .horse:
             return "Лошадь"
-        case .elephant:
-            return "Слониха"
+        case .pig:
+            return "Свинья"
         case .sheep:
             return "Овца"
         case .goat:
             return "Коза"
-        case .tiger:
-            return "Тигрица"
+        case .hippo:
+            return "Бегемот"
         case .chicken:
             return "Курица"
+        case .buffalo:
+            return "Буйволица"
         }
     }
     var labelM: String {
@@ -43,16 +56,18 @@ enum Type: String {
             return "Бык"
         case .horse:
             return "Конь"
-        case .elephant:
-            return "Слон"
+        case .pig:
+            return "Хряк"
         case .sheep:
             return "Баран"
         case .goat:
             return "Козел"
-        case .tiger:
-            return "Тигр"
+        case .hippo:
+            return "Бегемот"
         case .chicken:
             return "Петух"
+        case .buffalo:
+            return "Буйвол"
         }
     }
     var visForward: Int {
@@ -61,15 +76,17 @@ enum Type: String {
             return 3
         case .horse:
             return 5
-        case .elephant:
+        case .pig:
             return 2
         case .sheep:
             return 3
         case .goat:
             return 4
-        case .tiger:
+        case .hippo:
             return 7
         case .chicken:
+            return 3
+        case .buffalo:
             return 2
         }
     }
@@ -79,16 +96,18 @@ enum Type: String {
             return 2
         case .horse:
             return 2
-        case .elephant:
+        case .pig:
             return 1
         case .sheep:
             return 1
         case .goat:
             return 1
-        case .tiger:
-            return 0
+        case .hippo:
+            return 3
         case .chicken:
-            return 1
+            return 0
+        case .buffalo:
+            return 2
         }
     }
 }
@@ -231,8 +250,8 @@ struct visibleObject {
 }
 
 
-let maleNames: [String] = ["Ричард", "Сэм", "Томас", "Чак", "Говард", "Игнасио", "Клайд", "Снежок", "Рудольф", "Бильбо", "Имхотеп", "Кеша", "Борис", "Том", "Шанти", "Джон", "Мигель", "Кремень", "Лео", "Джерри"]
-let femaleNames: [String] = ["София", "Дейзи", "Кара", "Дора", "Бонни", "Сара", "Мэри", "Люси", "Сюзанна", "Мария", "Ромашка", "Колокольчик", "Лиза", "Эбигейл", "Астра", "Пандора", "Кэт", "Бэт", "Черри", "Роза"]
+let maleNames: [String] = ["Ричард", "Сэм", "Томас", "Чак", "Говард", "Игнасио", "Клайд", "Снежок", "Рудольф", "Бильбо", "Имхотеп", "Кеша", "Борис", "Том", "Шанти", "Джон", "Мигель", "Кремень", "Лео", "Джерри", "Бандит", "Гарфилд", "Декстер", "Лаки", "Майло", "Каспер", "Маркус", "Оливер", "Орех", "Пушистик", "Рокки", "Саймон", "Симба", "Смоки", "Сникерс", "Такер", "Тень", "Тимми", "Чад", "Чеддер", "Честер", "Тюбик", "Феликс", "Тони", "Ромео"]
+let femaleNames: [String] = ["София", "Дейзи", "Кара", "Дора", "Бонни", "Сара", "Мэри", "Люси", "Сюзанна", "Мария", "Ромашка", "Колокольчик", "Лиза", "Эбигейл", "Астра", "Пандора", "Кэт", "Бэт", "Черри", "Роза", "Коко", "Луна", "Варежка", "Лапша", "Минни", "Пеппер", "Свити", "Таблетка", "Тыква", "Фиби", "Фиона", "Харли", "Хлои", "Молли", "Долли", "Мэгги", "Мисти", "Клео", "Ангела", "Жасмин", "Аврора", "Айва", "Венди", "Айрис", "Гайка"]
 
 class Animal {
     // Имя
@@ -282,16 +301,16 @@ class Animal {
         type = myType
         // Get food type
         switch type {
-        case .cow, .elephant, .goat, .sheep, .chicken, .horse:
-            isPredator = false
-        default:
+        case .hippo:
             isPredator = true
+        default:
+            isPredator = false
         }
         // Get size
         switch type {
         case .chicken:
             sizeType = .small
-        case .elephant:
+        case .buffalo, .hippo:
             sizeType = .large
         default:
             sizeType = .medium

@@ -42,6 +42,7 @@ class Ground {
     var sizeTile: Int = 90
     var tiles: [[Tile]] = []
     var initFoodCount: Int = 0
+    var totalFoodCount: Int = 0
     
     let tileDefault = Tile(type: .grass, foodCount: 0, waterHere: false, isEmpty: true, isAcessable: true, meatCount: 0)
     
@@ -66,4 +67,66 @@ class Ground {
         }
     }
     
+    func getFoodCount() -> Int {
+        totalFoodCount = 0
+        for column in 0..<sizeHorizontal {
+        for row in 0..<sizeVertical {
+            totalFoodCount += tiles[column][row].foodCount
+            }
+        }
+        return totalFoodCount
+    }
+    
+    /// Calc food count
+    func calcFood() -> Int {
+        totalFoodCount = 0
+        for column in 0..<sizeHorizontal {
+            for row in 0..<sizeVertical {
+                let currentTileFood = tiles[column][row].foodCount
+                let currentTileType = tiles[column][row].type
+                if currentTileType == .forest {
+                    var newTileFood = 0
+                    let chance = Int.random(in: 0...100)
+                    switch currentTileFood {
+                    case 1:
+                        switch chance {
+                        case 0...10:
+                            newTileFood = 2
+                        case 11...70:
+                            newTileFood = 1
+                        default:
+                            newTileFood = 0
+                        }
+                    case 2:
+                        switch chance {
+                        case 0...10:
+                            newTileFood = 3
+                        case 11...60:
+                            newTileFood = 2
+                        default:
+                            newTileFood = 1
+                        }
+                    case 3:
+                        switch chance {
+                        case 0...60:
+                            newTileFood = 2
+                        default:
+                            newTileFood = 3
+                        }
+                    default:
+                        switch chance {
+                        case 0...60:
+                            newTileFood = 1
+                        default:
+                            newTileFood = 0
+                        }
+                    }
+                    totalFoodCount += newTileFood
+                    tiles[column][row].foodCount = newTileFood
+                }
+            }
+        }
+        //print("FOOD = \(totalFoodCount)")
+        return totalFoodCount
+    }
 }

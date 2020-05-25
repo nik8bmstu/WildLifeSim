@@ -25,21 +25,30 @@ class Environment {
         if hour == 24 {
             hour = 0
             day += 1
-            calcFood(map: map)
+            foodCount = map.calcFood()
         }
         isDayTime = ((7 < hour) && (hour < 20)) ? true : false
         animals.shuffle()
         var deadAnimals: Int = 0
+        predatorCount = 0
+        herbivorousCount = 0
         for i in 0..<animalCount {
             animals[i].legend = ""
             // Act from previous step is first for correct environment
             animals[i].act(map: earth, neighbors: self)
+            foodCount = map.getFoodCount()
             animals[i].demandsGrow()
             animals[i].look(map: earth, neighbors: self)
             animals[i].think(map: earth, neighbors: self)
             if !animals[i].isAlive {
                 deadAnimals += 1
             }
+            if animals[i].isPredator {
+                predatorCount += 1
+            } else {
+                herbivorousCount += 1
+            }
+                
             if animals[i].isPregnant {
                 animals[i].pregnantTime += 1
                 if animals[i].pregnantTime >= animals[i].sizeType.pregnantTime {
@@ -69,19 +78,21 @@ class Environment {
     /// Init start animal pool
     func animalsInit() {
         let randomPlace = Coord(col: -1, row: -1)
+        let initCount = earth.sizeHorizontal * earth.sizeVertical / 50
         // Place animals
-        for _ in 0...1 {
-            animals.append(Animal(map: earth, place: randomPlace, myType: .sheep))
-            animals.append(Animal(map: earth, place: randomPlace, myType: .cow))
-            animals.append(Animal(map: earth, place: randomPlace, myType: .horse))
-            animals.append(Animal(map: earth, place: randomPlace, myType: .goat))
-            animals.append(Animal(map: earth, place: randomPlace, myType: .chicken))
+        for _ in 0..<initCount {
+            animals.append(Animal(map: earth, place: randomPlace, myType: generateAnimalType()))
         }
         animalCount = animals.count
         totalAnimalCount = animalCount
         for i in 0..<animalCount {
             animals[i].defineVisibleTiles(map: earth)
         }
+    }
+    
+    /// Type generator
+    func generateAnimalType() -> Type {
+        return Type.allCases[Int.random(in: 0..<Type.allCases.count)]
     }
     
     /// New animal birth
@@ -104,57 +115,7 @@ class Environment {
         return -1
     }
     
-    /// Calc food count
-    func calcFood(map: Ground) {
-        foodCount = 0
-        for column in 0..<map.sizeHorizontal {
-            for row in 0..<map.sizeVertical {
-                let currentTileFood = map.tiles[column][row].foodCount
-                let currentTileType = map.tiles[column][row].type
-                if currentTileType == .forest {
-                    var newTileFood = 0
-                    let chance = Int.random(in: 0...100)
-                    switch currentTileFood {
-                    case 1:
-                        switch chance {
-                        case 0...10:
-                            newTileFood = 2
-                        case 11...70:
-                            newTileFood = 1
-                        default:
-                            newTileFood = 0
-                        }
-                    case 2:
-                        switch chance {
-                        case 0...10:
-                            newTileFood = 3
-                        case 11...60:
-                            newTileFood = 2
-                        default:
-                            newTileFood = 1
-                        }
-                    case 3:
-                        switch chance {
-                        case 0...60:
-                            newTileFood = 2
-                        default:
-                            newTileFood = 3
-                        }
-                    default:
-                        switch chance {
-                        case 0...60:
-                            newTileFood = 1
-                        default:
-                            newTileFood = 0
-                        }
-                    }
-                    foodCount += newTileFood
-                    map.tiles[column][row].foodCount = newTileFood
-                }
-            }
-        }
-        print("FOOD = \(foodCount)")
-    }
+
 }
 
 

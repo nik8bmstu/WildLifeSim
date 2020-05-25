@@ -63,6 +63,7 @@ class GameScene: SKScene {
     var food1: SKTileGroup!
     var food2: SKTileGroup!
     var food3: SKTileGroup!
+    var meat: SKTileGroup!
     
     // Connect Animal Tile set
     var animalTileSet = SKTileSet(named: "animals")
@@ -239,7 +240,7 @@ class GameScene: SKScene {
         } else if curTile.meatCount == 0 {
             tileEmpty.text = "Занята животным"
         } else {
-            tileEmpty.text = "Занята мясом"
+            tileEmpty.text = "Занята мясом (\(curTile.meatCount))"
         }
         
         tileInfo.addChild(tileFood)
@@ -278,6 +279,8 @@ class GameScene: SKScene {
                     animalName.fontColor = color
                     
                     var parameters = type + " (" + env.animals[index].sizeType.description + ")\n"
+                    parameters.append("Возраст: \(env.animals[index].age)\n")
+                    parameters.append("Поколение: \(env.animals[index].generation)\n")
                     parameters.append("Вес: (\(env.animals[index].sizeType.sizeMin)) <= \(env.animals[index].size) => (\(env.animals[index].sizeType.sizeMax))\n")
                     parameters.append("Голод: \(env.animals[index].hungerDemand) / \(demandLevelMax)\n")
                     parameters.append("Жажда: \(env.animals[index].thirstDemand) / \(demandLevelMax)\n")
@@ -343,6 +346,9 @@ class GameScene: SKScene {
                 default:
                     _ = 0
                 }
+                if earth.tiles[column][row].meatCount != 0 {
+                    foodLayer.setTileGroup(meat, forColumn: column, row: row)
+                }
             }
         }
         foodMap.addChild(foodLayer)
@@ -401,6 +407,8 @@ class GameScene: SKScene {
         food1 = foodTileSet!.tileGroups.first  {$0.name == "1"}!
         food2 = foodTileSet!.tileGroups.first  {$0.name == "2"}!
         food3 = foodTileSet!.tileGroups.first  {$0.name == "3"}!
+        // meat
+        meat = foodTileSet!.tileGroups.first {$0.name == "meat"}!
         // Create map layers
         foodLayer = SKTileMapNode(tileSet: foodTileSet!, columns: earth.sizeHorizontal, rows: earth.sizeVertical, tileSize: tileSize)
         foodLayer.name = "foodLayer"
