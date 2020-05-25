@@ -7,8 +7,29 @@
 //
 
 import Foundation
+import Darwin
 
 let demandLevelMax = 100
+
+enum Step: String {
+    case left = "Повернуть налево"
+    case right = "Повернуть направо"
+    case forward = "Пройти прямо"
+    case none = "Нет доступа"
+    static var allCases: [Step] = [.left, .right, .forward]
+    var short: String {
+        switch self {
+        case .forward:
+            return "F"
+        case .right:
+            return "R"
+        case .left:
+            return "L"
+        default:
+            return "N"
+        }
+    }
+}
 
 enum Type: String {
     // // herb
@@ -239,6 +260,8 @@ enum visObjType: String {
     case lookLeft = "Повернуться налево"
     case lookRight = "Повернуться направо"
     case forward = "Идти дальше"
+    case target = "Догнать добычу"
+    case meat = "Съесть мясо"
     case initial = ""
 }
 
@@ -394,9 +417,6 @@ class Animal {
             let way = wayLength(target: tileCoord)
             switch visibleObjects[i].type {
             case .food:
-                if visibleObjects[i].interestLevel == 3 {
-                    mood += 1
-                }
                 if targetObject.type == .food && !isActOK {
                     visibleObjects[i].interestLevel = 0
                 } else {
@@ -417,7 +437,7 @@ class Animal {
                 }
                 mood += 1
             case .danger:
-                visibleObjects[i].interestLevel = 100 / way
+                visibleObjects[i].interestLevel = 200 - way * way
                 mood -= 10
             case .forward:
                 if targetObject.type == .forward {
@@ -440,6 +460,10 @@ class Animal {
                 }
             case .sleep:
                 visibleObjects[i].interestLevel = sleepDemand * 4 - hungerDemand - thirstDemand - Int.random(in: 0...abs(mood))
+            case .meat:
+                    visibleObjects[i].interestLevel = visibleObjects[i].interestLevel * hungerDemand * 4 - way * 2 + (sizeType.sizeMax - size)
+            case .target:
+                visibleObjects[i].interestLevel = hungerDemand * 4 - sleepDemand * 2 - way * way
             default:
                 print("Default switch")
             }
@@ -484,7 +508,7 @@ class Animal {
             isActOK = true
         case .food:
             if wayLength(target: targetObject.tile) == 1 {
-                eat(tile: targetObject.tile, map: map)
+                eatFood(tile: targetObject.tile, map: map)
             } else {
                 findWay(tile: targetObject.tile, map: map)
             }
@@ -502,6 +526,18 @@ class Animal {
             } else {
                 findWay(tile: targetObject.tile, map: map)
             }
+        case .meat:
+            if wayLength(target: targetObject.tile) == 1 {
+                eatMeat(tile: targetObject.tile, map: map)
+            } else {
+                findWay(tile: targetObject.tile, map: map)
+            }
+        case .target:
+            if wayLength(target: targetObject.tile) == 1 {
+                killTarget(tile: targetObject.tile, map: map)
+            } else {
+                findWay(tile: targetObject.tile, map: map)
+            }
         default:
             isActOK = false
         }
@@ -516,17 +552,84 @@ class Animal {
     // Actions
     
     /// Find way - MOST important func... but not now
-    func findWay(tile: Coord, map: Ground) {
-        goForward(map: map)
-        if !isActOK {
-            switch Int.random(in: 0...1) {
-            case 0:
-                rotateLeft()
-            default:
-                rotateRight()
+    func findWay(tile: Coord, map: Ground) -> Bool {
+        print("My coord \(transformCoord(col: coord.col, row: coord.row))")
+        print("Iwant to \(transformCoord(col: tile.col, row: tile.row))")
+        let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
+        // find 4 points near target
+        var targetPoints: [Coord] = []
+        var checkPoints: [Coord] = []
+        checkPoints.append(Coord(col: tile.col, row: tile.row + 1))     // up
+        checkPoints.append(Coord(col: tile.col, row: tile.row - 1))     // down
+        checkPoints.append(Coord(col: tile.col - 1, row: tile.row))     // left
+        checkPoints.append(Coord(col: tile.col + 1, row: tile.row))     // right
+        for i in 0..<checkPoints.count {
+            if isTileExist(coord: checkPoints[i], limit: limitCoord) {
+                if isTileAlreadyVisible(coord: checkPoints[i]) {
+                    if map.tiles[checkPoints[i].col][checkPoints[i].row].isEmpty {
+                        if map.tiles[checkPoints[i].col][checkPoints[i].row].isAcessable {
+                            targetPoints.append(checkPoints[i])
+                            print("Find way to \(transformCoord(col: checkPoints[i].col, row: checkPoints[i].row))")
+                        }
+                    }
+                }
             }
         }
+        if targetPoints.count == 0 {
+            isActOK = false
+            return false
+        } else {
+            let maxSteps = 2
+            let maxRows = Int(pow(Double(Step.allCases.count), Double(maxSteps)))
+            let maxElements = maxRows * maxSteps
+            //var route: [Step] = []
+            var variants: [[Step]] = Array(repeating: Array(repeating: .none, count: maxSteps), count: maxRows)
+            var row = 0
+            var col = 0
+            var base = maxRows
+            var newBase = maxRows
+            var remain = 0
+            while col != maxSteps {
+                remain = newBase % Step.allCases.count
+                variants[row][col] = Step.allCases[remain]
+                row += 1
+                if row == maxRows {
+                    row = 0
+                    col += 1
+                    if col == maxSteps {
+                        break
+                    }
+                }
+                newBase = newBase / Step.allCases.count
+                if newBase < Step.allCases.count {
+                    variants[row][col] = Step.allCases[newBase]
+                    row += 1
+                    if row == maxRows {
+                        row = 0
+                        col += 1
+                        if col == maxSteps {
+                            break
+                        }
+                    }
+                    newBase = base - 1
+                    base -= 1
+                }
+                
+            }
+            for route in 0..<maxRows {
+                var row = "Route \"\(route + 1)\": "
+            for i in 0..<maxSteps {
+                row.append(variants[route][i].short)
+                }
+                print(row)
+            }
+        }
+        
+        
+        
+        return true
     }
+    
     
     /// Rotate left
     func rotateLeft() {
@@ -599,8 +702,8 @@ class Animal {
         return targetCoord
     }
     
-    /// Eat
-    func eat(tile: Coord, map: Ground) {
+    /// Eat food
+    func eatFood(tile: Coord, map: Ground) {
         if map.tiles[tile.col][tile.row].foodCount > 0 {
             map.tiles[tile.col][tile.row].foodCount -= 1
             if hungerDemand > 10 {
@@ -624,7 +727,39 @@ class Animal {
         }
     }
     
-    /// Eat
+    /// Eat meat
+    func eatMeat(tile: Coord, map: Ground) {
+        if map.tiles[tile.col][tile.row].meatCount > 0 {
+            map.tiles[tile.col][tile.row].meatCount -= 1
+            if hungerDemand > 10 {
+                switch sizeType {
+                case .small:
+                    hungerDemand -= demandLevelMax / 2
+                case .medium:
+                    hungerDemand -= demandLevelMax / 4
+                case .large:
+                    hungerDemand -= demandLevelMax / 6
+                }
+            } else {
+                hungerDemand = 0
+                if size <= (sizeType.sizeMax - sizeType.growSize) {
+                    size += sizeType.growSize
+                }
+            }
+            hungerDemand = hungerDemand < 0 ? 0 : hungerDemand
+            isActOK = true
+            mood += 1
+        }
+    }
+    
+    /// Kill target
+    func killTarget(tile: Coord, map: Ground) {
+        
+            isActOK = false
+            //mood += 1
+    }
+    
+    /// Drink
     func drink(tile: Coord, map: Ground) {
         if map.tiles[tile.col][tile.row].waterHere {
             switch sizeType {
@@ -708,7 +843,7 @@ class Animal {
                 let index = neighbors.getAnimalIndex(coord: currentCoord)
                 // if animal not dead
                 if index >= 0 {
-                    // If it alive
+                    // If it is alive
                     if neighbors.animals[index].isAlive {
                         // I i am not a predator
                         if !isPredator {
@@ -725,7 +860,17 @@ class Animal {
                                     }
                                 }
                             }
+                        } else {
+                            // I am predator
+                            if neighbors.animals[index].size < size {
+                                visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: 0, type: .target, description: ""))
+                            }
                         }
+                    }
+                } else {
+                    if tile.meatCount > 0 {
+                        // See meat
+                        visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: tile.meatCount, type: .meat, description: ""))
                     }
                 }
             }
