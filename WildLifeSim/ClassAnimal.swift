@@ -579,40 +579,58 @@ class Animal {
             isActOK = false
             return false
         } else {
-            let maxSteps = 2
+            let maxSteps = 10
             let maxRows = Int(pow(Double(Step.allCases.count), Double(maxSteps)))
             let maxElements = maxRows * maxSteps
             //var route: [Step] = []
             var variants: [[Step]] = Array(repeating: Array(repeating: .none, count: maxSteps), count: maxRows)
+
+            
             var row = 0
             var col = 0
-            var base = maxRows
-            var newBase = maxRows
+            var base = maxRows - 1
+            var newBase = maxRows - 1
             var remain = 0
-            while col != maxSteps {
+            while col * row <= maxElements {
+                if row == 18 {
+                    
+                }
                 remain = newBase % Step.allCases.count
                 variants[row][col] = Step.allCases[remain]
-                row += 1
-                if row == maxRows {
-                    row = 0
-                    col += 1
-                    if col == maxSteps {
+                col += 1
+                if col == maxSteps {
+                    col = 0
+                    row += 1
+                    if row == maxRows {
                         break
                     }
                 }
                 newBase = newBase / Step.allCases.count
                 if newBase < Step.allCases.count {
                     variants[row][col] = Step.allCases[newBase]
-                    row += 1
-                    if row == maxRows {
-                        row = 0
-                        col += 1
-                        if col == maxSteps {
+                    col += 1
+                    if col == maxSteps {
+                        col = 0
+                        row += 1
+                        if row == maxRows {
+                            break
+                        }
+                    } else {
+                        for i in col..<maxSteps {
+                            variants[row][i] = Step.allCases[0]
+                        }
+                        col = 0
+                        row += 1
+                        if row == maxRows {
                             break
                         }
                     }
-                    newBase = base - 1
                     base -= 1
+                    if base < 0 {
+                        break
+                    }
+                    newBase = base
+                    
                 }
                 
             }
