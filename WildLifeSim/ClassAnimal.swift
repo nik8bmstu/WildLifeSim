@@ -314,7 +314,7 @@ class Animal {
     // Previos act was successful
     var isActOK: Bool = false
     // Last rotation
-    var lastRotate: Direction = .right
+    //var lastRotate: Direction = .right
     // Настроение
     var mood: Int = 0
     
@@ -442,10 +442,10 @@ class Animal {
             case .forward:
                 if targetObject.type == .forward {
                     targetObject.interestLevel = 0
-                    if canForward(map: map) {
+                    if canForward(map: map, curTile: coord, dir: direction) {
                         visibleObjects[i].interestLevel = hungerDemand * 2 - sleepDemand * 2 - Int.random(in: 0...10)
                     }
-                } else if canForward(map: map) {
+                } else if canForward(map: map, curTile: coord, dir: direction) {
                     visibleObjects[i].interestLevel = (thirstDemand + hungerDemand) * 2 - sleepDemand * 3  + Int.random(in: 0...10)
                 }
             case .lookLeft:
@@ -497,10 +497,10 @@ class Animal {
         isActOK = false
         switch targetObject.type {
         case .lookLeft:
-            rotateLeft()
+            direction = rotateLeft(curDir: direction)
             isActOK = true
         case .lookRight:
-            rotateRight()
+            direction = rotateRight(curDir: direction)
             isActOK = true
         case .sleep:
             sleep()
@@ -510,13 +510,15 @@ class Animal {
             if wayLength(target: targetObject.tile) == 1 {
                 eatFood(tile: targetObject.tile, map: map)
             } else {
-                findWay(tile: targetObject.tile, map: map)
+                let step = findWay(tile: targetObject.tile, map: map)
+                nextStep(step: step, map: map)
             }
         case .water:
             if wayLength(target: targetObject.tile) == 1 {
                 drink(tile: targetObject.tile, map: map)
             } else {
-                findWay(tile: targetObject.tile, map: map)
+                let step = findWay(tile: targetObject.tile, map: map)
+                nextStep(step: step, map: map)
             }
         case .forward:
             goForward(map: map)
@@ -524,19 +526,22 @@ class Animal {
             if wayLength(target: targetObject.tile) == 1 {
                 continueLine()
             } else {
-                findWay(tile: targetObject.tile, map: map)
+                let step = findWay(tile: targetObject.tile, map: map)
+                nextStep(step: step, map: map)
             }
         case .meat:
             if wayLength(target: targetObject.tile) == 1 {
                 eatMeat(tile: targetObject.tile, map: map)
             } else {
-                findWay(tile: targetObject.tile, map: map)
+                let step = findWay(tile: targetObject.tile, map: map)
+                nextStep(step: step, map: map)
             }
         case .target:
             if wayLength(target: targetObject.tile) == 1 {
                 killTarget(tile: targetObject.tile, map: map)
             } else {
-                findWay(tile: targetObject.tile, map: map)
+                let step = findWay(tile: targetObject.tile, map: map)
+                nextStep(step: step, map: map)
             }
         default:
             isActOK = false
@@ -552,7 +557,7 @@ class Animal {
     // Actions
     
     /// Find way - MOST important func... but not now
-    func findWay(tile: Coord, map: Ground) -> Bool {
+    func findWay(tile: Coord, map: Ground) -> Step {
         print("My coord \(transformCoord(col: coord.col, row: coord.row))")
         print("Iwant to \(transformCoord(col: tile.col, row: tile.row))")
         let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
@@ -577,24 +582,19 @@ class Animal {
         }
         if targetPoints.count == 0 {
             isActOK = false
-            return false
+            return .none
         } else {
-            let maxSteps = 10
+            let maxSteps = 6
             let maxRows = Int(pow(Double(Step.allCases.count), Double(maxSteps)))
             let maxElements = maxRows * maxSteps
             //var route: [Step] = []
             var variants: [[Step]] = Array(repeating: Array(repeating: .none, count: maxSteps), count: maxRows)
-
-            
             var row = 0
             var col = 0
             var base = maxRows - 1
             var newBase = maxRows - 1
             var remain = 0
             while col * row <= maxElements {
-                if row == 18 {
-                    
-                }
                 remain = newBase % Step.allCases.count
                 variants[row][col] = Step.allCases[remain]
                 col += 1
@@ -630,60 +630,126 @@ class Animal {
                         break
                     }
                     newBase = base
-                    
                 }
-                
             }
+            print("Routes length:")
+            var routeLength = Array(repeating: 999, count: maxRows)
             for route in 0..<maxRows {
-                var row = "Route \"\(route + 1)\": "
-            for i in 0..<maxSteps {
-                row.append(variants[route][i].short)
+                routeLength[route] = checkRoute(route: variants[route], tile: coord, dir: direction, targets: targetPoints, map: map)
+                /*var row = "Route \"\(route + 1)\": "
+                for i in 0..<maxSteps {
+                    row.append(variants[route][i].short)
                 }
+                row.append(" : " + String(routeLength[route]))
+                print(row)*/
+            }
+            var min = routeLength[0]
+            var minIndex = 0
+            for i in 0..<routeLength.count {
+                if routeLength[i] < min {
+                    min = routeLength[i]
+                    minIndex = i
+                }
+            }
+            if min == 999 {
+                return .none
+            } else {
+                var row = "Route \"\(minIndex)\": "
+                for i in 0..<maxSteps {
+                    row.append(variants[minIndex][i].short)
+                }
+                row.append(" : " + String(routeLength[minIndex]))
                 print(row)
+                return variants[minIndex][0]
             }
         }
         
-        
-        
-        return true
     }
     
+    /// Check route
+    func checkRoute(route: [Step], tile: Coord, dir: Direction, targets: [Coord], map: Ground) -> Int {
+        var curCoord = tile
+        var curDir = dir
+        var way: Int = 0
+        for step in 0..<route.count {
+            switch route[step] {
+            case .left:
+                curDir = rotateLeft(curDir: curDir)
+                way += 1
+            case .right:
+                curDir = rotateRight(curDir: curDir)
+                way += 1
+            case .forward:
+                if canForward(map: map, curTile: curCoord, dir: curDir) {
+                    curCoord = forwardCoord(curTile: curCoord, dir: curDir)
+                    way += 1
+                    for i in 0..<targets.count {
+                        if (curCoord.col == targets[i].col) && (curCoord.row == targets[i].row) {
+                            return way
+                        }
+                    }
+                } else {
+                    return 999
+                }
+            default:
+                _ = 0
+            }
+        }
+        return 999
+    }
+    
+    /// Next step
+    func nextStep(step: Step, map: Ground) {
+        isActOK = true
+        switch step {
+        case .forward:
+            goForward(map: map)
+        case .left:
+            direction = rotateLeft(curDir: direction)
+        case .right:
+            direction = rotateRight(curDir: direction)
+        default:
+            isActOK = false
+        }
+    }
     
     /// Rotate left
-    func rotateLeft() {
-        switch direction {
+    func rotateLeft(curDir: Direction) -> Direction {
+        var newDir: Direction
+        switch curDir {
         case .down:
-            direction = .right
+            newDir = .right
         case .right:
-            direction = .up
+            newDir = .up
         case .up:
-            direction = .left
+            newDir = .left
         default:
-            direction = .down
+            newDir = .down
         }
-        lastRotate = .left
+        return newDir
     }
     
     /// Rotate right
-    func rotateRight() {
-        switch direction {
+    func rotateRight(curDir: Direction) -> Direction {
+        var newDir: Direction
+        switch curDir {
         case .down:
-            direction = .left
+            newDir = .left
         case .right:
-            direction = .down
+            newDir = .down
         case .up:
-            direction = .right
+            newDir = .right
         default:
-            direction = .up
+            newDir = .up
         }
-        lastRotate = .right
+        return newDir
     }
     
     /// Go forward
     func goForward(map: Ground) {
         isActOK = false
-        let targetCoord: Coord = forwardCoord()
-        if canForward(map: map) {
+        let targetCoord: Coord = forwardCoord(curTile: coord, dir: direction)
+        if canForward(map: map, curTile: coord, dir: direction) {
             map.tiles[coord.col][coord.row].isEmpty = true
             coord = targetCoord
             map.tiles[coord.col][coord.row].isEmpty = false
@@ -692,22 +758,24 @@ class Animal {
     }
     
     /// Check, can I go forward
-    func canForward(map: Ground) -> Bool {
-        let targetCoord = forwardCoord()
+    func canForward(map: Ground, curTile: Coord, dir: Direction) -> Bool {
+        let targetCoord = forwardCoord(curTile: curTile, dir: dir)
         let limitCoord = Coord(col: map.sizeHorizontal, row: map.sizeVertical)
         if isTileExist(coord: targetCoord, limit: limitCoord) {
             let tile = map.tiles[targetCoord.col][targetCoord.row]
             if tile.isEmpty && tile.isAcessable {
-                return true
+                if isTileAlreadyVisible(coord: targetCoord) {
+                    return true
+                }
             }
         }
         return false
     }
     
     /// Get Forward tile coord
-    func forwardCoord() -> Coord {
-        var targetCoord: Coord = coord
-        switch direction {
+    func forwardCoord(curTile: Coord, dir: Direction) -> Coord {
+        var targetCoord: Coord = curTile
+        switch dir {
         case .down:
             targetCoord.row -= 1
         case .right:
@@ -843,7 +911,7 @@ class Animal {
         visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .sleep, description: ""))
         visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookLeft, description: ""))
         visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .lookRight, description: ""))
-        if canForward(map: map) {
+        if canForward(map: map, curTile: coord, dir: direction) {
             visibleObjects.append(visibleObject(tile: coord, interestLevel: 0, type: .forward, description: ""))
         }
         defineVisibleTiles(map: map)
@@ -886,7 +954,7 @@ class Animal {
                         }
                     }
                 } else {
-                    if tile.meatCount > 0 {
+                    if tile.meatCount > 0 && isPredator {
                         // See meat
                         visibleObjects.append(visibleObject(tile: currentCoord, interestLevel: tile.meatCount, type: .meat, description: ""))
                     }
